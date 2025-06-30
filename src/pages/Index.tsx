@@ -7,6 +7,7 @@ import { CreditCardManager } from "@/components/CreditCardManager";
 import { QuickRecommendation } from "@/components/QuickRecommendation";
 import { RewardsDashboard } from "@/components/RewardsDashboard";
 import { AICardScanner } from "@/components/AICardScanner";
+import { CardDropdown } from "@/components/CardDropdown";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -22,8 +23,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Clean Header */}
-      <header className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-100">
+      {/* Native Mobile Header */}
+      <header className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-100 sticky top-0 z-50">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
             <CreditCard className="w-4 h-4 text-white" />
@@ -101,8 +102,8 @@ const Index = () => {
                 >
                   <Plus className="w-5 h-5 mr-3 text-gray-600" />
                   <div className="text-left">
-                    <div className="font-medium text-gray-900">Manage Cards</div>
-                    <div className="text-xs text-gray-500">Add or edit your cards</div>
+                    <div className="font-medium text-gray-900">Browse Popular Cards</div>
+                    <div className="text-xs text-gray-500">Choose from pre-selected options</div>
                   </div>
                 </Button>
               </div>
@@ -139,10 +140,10 @@ const Index = () => {
                   <h3 className="font-bold text-gray-900 mb-1">Start Building Your Portfolio</h3>
                   <p className="text-gray-600 text-sm mb-4">Add your first card to get personalized recommendations</p>
                   <Button 
-                    onClick={() => setActiveTab('scan')}
+                    onClick={() => setActiveTab('cards')}
                     className="bg-gray-900 hover:bg-gray-800 text-white"
                   >
-                    Add First Card
+                    Browse Cards
                   </Button>
                 </CardContent>
               </Card>
@@ -157,7 +158,8 @@ const Index = () => {
         )}
 
         {activeTab === 'cards' && (
-          <div className="p-4">
+          <div className="p-4 space-y-6">
+            <CardDropdown onAddCard={addCard} userCards={userCards} />
             <CreditCardManager 
               userCards={userCards}
               onAddCard={addCard}
@@ -179,8 +181,8 @@ const Index = () => {
         )}
       </main>
 
-      {/* Clean Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100">
+      {/* Native Mobile Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 safe-area-pb">
         <div className="flex items-center justify-around py-2">
           <button
             onClick={() => setActiveTab('home')}
