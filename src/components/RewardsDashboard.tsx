@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, DollarSign, CreditCard, Target } from "lucide-react";
+import { TrendingUp, DollarSign, CreditCard, Target, Trophy, Star } from "lucide-react";
 
 export const RewardsDashboard = ({ userCards }: { userCards: any[] }) => {
   const getTotalCards = () => userCards.length;
@@ -17,162 +17,136 @@ export const RewardsDashboard = ({ userCards }: { userCards: any[] }) => {
     return userCards.reduce((sum, card) => sum + (parseFloat(card.annualFee) || 0), 0);
   };
 
-  const getCardsByType = () => {
-    const types: { [key: string]: number } = {};
-    userCards.forEach(card => {
-      types[card.type] = (types[card.type] || 0) + 1;
-    });
-    return types;
-  };
-
-  const cardTypes = getCardsByType();
-
   return (
-    <div className="space-y-4 md:space-y-6">
-      <div>
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Portfolio Overview</h2>
-        <p className="text-sm md:text-base text-gray-600">Your credit card portfolio at a glance</p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Your Rewards</h1>
+        <p className="text-gray-600">Track your credit card portfolio performance</p>
       </div>
 
-      {/* Mobile-optimized Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <CardHeader className="pb-2 md:pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xs md:text-sm font-medium">Total Cards</CardTitle>
-              <CreditCard className="h-3 w-3 md:h-4 md:w-4" />
+      {/* Main Stats */}
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="rounded-2xl border-0 shadow-sm bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <CreditCard className="w-5 h-5 opacity-80" />
+              <span className="text-xs opacity-80">CARDS</span>
             </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-lg md:text-2xl font-bold">{getTotalCards()}</div>
-            <p className="text-blue-100 text-xs">
-              {getTotalCards() === 0 ? 'Add cards' : 'Active cards'}
-            </p>
+            <div className="text-2xl font-bold">{getTotalCards()}</div>
+            <div className="text-xs opacity-80">Active in wallet</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-          <CardHeader className="pb-2 md:pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xs md:text-sm font-medium">Avg. Rate</CardTitle>
-              <TrendingUp className="h-3 w-3 md:h-4 md:w-4" />
+        <Card className="rounded-2xl border-0 shadow-sm bg-gradient-to-br from-green-500 to-green-600 text-white">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <TrendingUp className="w-5 h-5 opacity-80" />
+              <span className="text-xs opacity-80">AVG RATE</span>
             </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-lg md:text-2xl font-bold">{getAverageRewardRate()}%</div>
-            <p className="text-green-100 text-xs">
-              Portfolio avg
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-          <CardHeader className="pb-2 md:pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xs md:text-sm font-medium">Annual Fees</CardTitle>
-              <DollarSign className="h-3 w-3 md:h-4 md:w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-lg md:text-2xl font-bold">${getTotalAnnualFees()}</div>
-            <p className="text-purple-100 text-xs">
-              Total yearly
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-          <CardHeader className="pb-2 md:pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xs md:text-sm font-medium">Efficiency</CardTitle>
-              <Target className="h-3 w-3 md:h-4 md:w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-lg md:text-2xl font-bold">
-              {userCards.length > 0 ? '85%' : '0%'}
-            </div>
-            <p className="text-orange-100 text-xs">
-              Optimization
-            </p>
+            <div className="text-2xl font-bold">{getAverageRewardRate()}%</div>
+            <div className="text-xs opacity-80">Reward rate</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Card Types Breakdown - Mobile optimized */}
-      {userCards.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg md:text-xl">Portfolio Breakdown</CardTitle>
-            <CardDescription className="text-sm">Your cards by type and category</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium text-gray-900 mb-3 text-sm md:text-base">Card Types</h4>
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(cardTypes).map(([type, count]) => (
-                    <Badge key={type} variant="secondary" className="capitalize text-xs">
-                      {type.replace('-', ' ')}: {count}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-medium text-gray-900 mb-3 text-sm md:text-base">Recent Activity</h4>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded text-sm">
-                    <span className="text-gray-600">Portfolio created</span>
-                    <Badge variant="outline" className="text-xs">Today</Badge>
-                  </div>
-                  {userCards.length > 0 && (
-                    <div className="flex items-center justify-between py-2 px-3 bg-green-50 rounded text-sm">
-                      <span className="text-gray-600">Ready for recommendations</span>
-                      <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
-                    </div>
-                  )}
-                </div>
-              </div>
+      {/* Monthly Summary */}
+      <Card className="rounded-2xl border-0 shadow-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center">
+            <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
+            This Month
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl">
+            <div>
+              <div className="font-medium text-green-900">Total Rewards</div>
+              <div className="text-sm text-green-600">From all cards</div>
             </div>
+            <div className="text-2xl font-bold text-green-600">$247.50</div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 bg-gray-50 rounded-xl text-center">
+              <div className="text-lg font-bold text-gray-900">${getTotalAnnualFees()}</div>
+              <div className="text-xs text-gray-600">Annual fees</div>
+            </div>
+            <div className="p-3 bg-gray-50 rounded-xl text-center">
+              <div className="text-lg font-bold text-gray-900">12</div>
+              <div className="text-xs text-gray-600">Transactions</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Top Performing Cards */}
+      {userCards.length > 0 && (
+        <Card className="rounded-2xl border-0 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center">
+              <Star className="w-5 h-5 mr-2 text-purple-500" />
+              Top Cards
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {userCards.slice(0, 3).map((card, index) => (
+              <div key={card.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                  index === 0 ? 'bg-yellow-500' : 
+                  index === 1 ? 'bg-gray-400' : 'bg-orange-500'
+                }`}>
+                  {index + 1}
+                </div>
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">{card.name}</div>
+                  <div className="text-sm text-gray-500">{card.rewardRate}% rewards</div>
+                </div>
+                <Badge variant="secondary" className="text-xs">
+                  ${(Math.random() * 100).toFixed(0)}
+                </Badge>
+              </div>
+            ))}
           </CardContent>
         </Card>
       )}
 
-      {/* Smart Recommendations - Mobile optimized */}
-      {userCards.length > 0 && (
-        <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
-          <CardHeader>
-            <CardTitle className="text-indigo-900 text-lg md:text-xl">💡 Smart Recommendations</CardTitle>
-            <CardDescription className="text-indigo-700 text-sm">
-              Based on your current portfolio, here are some optimization tips:
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-start space-x-3">
-                <div className="bg-indigo-100 p-1 rounded">
-                  <TrendingUp className="h-4 w-4 text-indigo-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-indigo-900">Maximize Category Spending</p>
-                  <p className="text-xs md:text-sm text-indigo-700">Use the recommendation engine for each purchase to optimize rewards.</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="bg-indigo-100 p-1 rounded">
-                  <Target className="h-4 w-4 text-indigo-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-indigo-900">Track Your Progress</p>
-                  <p className="text-xs md:text-sm text-indigo-700">Monitor your monthly rewards to see the impact of smart card usage.</p>
-                </div>
-              </div>
+      {/* Empty State */}
+      {userCards.length === 0 && (
+        <Card className="rounded-2xl border-0 shadow-sm bg-gradient-to-br from-gray-50 to-gray-100">
+          <CardContent className="p-8 text-center">
+            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CreditCard className="w-8 h-8 text-gray-400" />
             </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">No Cards Yet</h3>
+            <p className="text-gray-600 text-sm">Add your credit cards to start tracking rewards</p>
           </CardContent>
         </Card>
       )}
+
+      {/* Quick Tips */}
+      <Card className="rounded-2xl border-0 shadow-sm bg-gradient-to-br from-purple-50 to-indigo-50">
+        <CardContent className="p-4">
+          <h4 className="font-bold text-purple-900 mb-3 flex items-center">
+            <Target className="w-4 h-4 mr-2" />
+            Pro Tips
+          </h4>
+          <div className="space-y-2 text-sm">
+            <div className="flex items-start space-x-2">
+              <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-2"></div>
+              <p className="text-purple-800">Use category cards for bonus rewards</p>
+            </div>
+            <div className="flex items-start space-x-2">
+              <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-2"></div>
+              <p className="text-purple-800">Check quarterly rotating categories</p>
+            </div>
+            <div className="flex items-start space-x-2">
+              <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-2"></div>
+              <p className="text-purple-800">Track your spending to optimize rewards</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
