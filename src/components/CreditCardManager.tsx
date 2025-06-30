@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, Plus, Trash2 } from "lucide-react";
+import { CreditCard, Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const CARD_TYPES = [
@@ -27,8 +26,9 @@ const REWARD_CATEGORIES = [
   { value: 'general', label: 'General Purchases' }
 ];
 
-export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }) => {
+export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }: any) => {
   const [showAddForm, setShowAddForm] = useState(false);
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [newCard, setNewCard] = useState({
     name: '',
     bank: '',
@@ -72,15 +72,15 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-3 md:space-y-0">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Your Credit Cards</h2>
-          <p className="text-gray-600">Manage your credit card portfolio</p>
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900">Your Credit Cards</h2>
+          <p className="text-sm md:text-base text-gray-600">Manage your credit card portfolio</p>
         </div>
         <Button 
           onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 w-full md:w-auto"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Credit Card
@@ -90,25 +90,26 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }) => {
       {showAddForm && (
         <Card className="border-2 border-blue-200">
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle className="flex items-center text-lg">
               <CreditCard className="h-5 w-5 mr-2" />
               Add New Credit Card
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Enter your credit card details to start getting personalized recommendations
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Card Name *</Label>
+                <div className="md:col-span-2">
+                  <Label htmlFor="name" className="text-sm">Card Name *</Label>
                   <Input
                     id="name"
                     value={newCard.name}
                     onChange={(e) => setNewCard({...newCard, name: e.target.value})}
                     placeholder="e.g., Chase Sapphire Preferred"
                     required
+                    className="mt-1"
                   />
                 </div>
                 <div>
@@ -194,14 +195,15 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }) => {
                 />
               </div>
 
-              <div className="flex space-x-3">
-                <Button type="submit" className="bg-green-600 hover:bg-green-700">
+              <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3">
+                <Button type="submit" className="bg-green-600 hover:bg-green-700 flex-1">
                   Add Card
                 </Button>
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => setShowAddForm(false)}
+                  className="flex-1"
                 >
                   Cancel
                 </Button>
@@ -211,32 +213,47 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }) => {
         </Card>
       )}
 
-      {/* Display existing cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {userCards.map((card) => (
+      {/* Mobile-optimized card display */}
+      <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:space-y-0">
+        {userCards.map((card: any) => (
           <Card key={card.id} className="hover:shadow-lg transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-lg">{card.name}</CardTitle>
-                  <CardDescription>{card.bank}</CardDescription>
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-base md:text-lg truncate">{card.name}</CardTitle>
+                  <CardDescription className="text-sm">{card.bank}</CardDescription>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onRemoveCard(card.id)}
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center space-x-1 ml-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setExpandedCard(expandedCard === card.id ? null : card.id)}
+                    className="md:hidden p-1"
+                  >
+                    {expandedCard === card.id ? 
+                      <ChevronUp className="h-4 w-4" /> : 
+                      <ChevronDown className="h-4 w-4" />
+                    }
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onRemoveCard(card.id)}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className={`space-y-3 ${expandedCard === card.id ? 'block' : 'hidden md:block'}`}>
               <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">{CARD_TYPES.find(t => t.value === card.type)?.label}</Badge>
+                <Badge variant="secondary" className="text-xs">
+                  {CARD_TYPES.find((t: any) => t.value === card.type)?.label}
+                </Badge>
                 {card.bonusCategory && (
-                  <Badge variant="outline">
-                    {REWARD_CATEGORIES.find(c => c.value === card.bonusCategory)?.label}
+                  <Badge variant="outline" className="text-xs">
+                    {REWARD_CATEGORIES.find((c: any) => c.value === card.bonusCategory)?.label}
                   </Badge>
                 )}
               </div>
@@ -249,12 +266,12 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }) => {
                   <p className="text-gray-600">Annual Fee: ${card.annualFee}</p>
                 )}
                 {card.signupBonus && (
-                  <p className="text-green-600 font-medium">Bonus: {card.signupBonus}</p>
+                  <p className="text-green-600 font-medium text-xs">{card.signupBonus}</p>
                 )}
               </div>
               
               {card.notes && (
-                <p className="text-sm text-gray-500 italic">{card.notes}</p>
+                <p className="text-xs text-gray-500 italic">{card.notes}</p>
               )}
             </CardContent>
           </Card>
