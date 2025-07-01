@@ -1,13 +1,13 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Plus, Home, Target, Scan, User, Settings, ArrowRight } from "lucide-react";
+import { CreditCard, Plus, Home, Target, Scan, User, Settings as SettingsIcon, ArrowRight } from "lucide-react";
 import { CreditCardManager } from "@/components/CreditCardManager";
 import { QuickRecommendation } from "@/components/QuickRecommendation";
 import { RewardsDashboard } from "@/components/RewardsDashboard";
 import { AICardScanner } from "@/components/AICardScanner";
 import { CardDropdown } from "@/components/CardDropdown";
+import { Settings } from "@/components/Settings";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -32,8 +32,13 @@ const Index = () => {
           <h1 className="text-xl font-bold text-gray-900">CardWise</h1>
         </div>
         
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
-          <Settings className="w-4 h-4 text-gray-600" />
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="w-8 h-8 p-0"
+          onClick={() => setActiveTab('settings')}
+        >
+          <SettingsIcon className="w-4 h-4 text-gray-600" />
         </Button>
       </header>
 
@@ -236,6 +241,21 @@ const Index = () => {
             <RewardsDashboard userCards={userCards} />
           </div>
         )}
+
+        {activeTab === 'settings' && (
+          <div className="p-4">
+            <div className="mb-4">
+              <Button
+                variant="ghost"
+                onClick={() => setActiveTab('home')}
+                className="mb-2"
+              >
+                ← Back to Home
+              </Button>
+            </div>
+            <Settings />
+          </div>
+        )}
       </main>
 
       {/* Bottom Navigation */}
@@ -287,6 +307,18 @@ const Index = () => {
           >
             <User className="w-5 h-5" />
             <span className="text-xs">Rewards</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-lg transition-colors ${
+              activeTab === 'settings' 
+                ? 'bg-gray-100 text-gray-900' 
+                : 'text-gray-500'
+            }`}
+          >
+            <SettingsIcon className="w-5 h-5" />
+            <span className="text-xs">Settings</span>
           </button>
         </div>
       </div>
