@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -72,11 +73,15 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }: any) =
   };
 
   const getCardVisual = (card: any) => {
-    // If card has an image and cardColor (from pre-programmed cards)
-    if (card.image && card.cardColor) {
+    // If card has an image (from pre-programmed cards)
+    if (card.image) {
       return (
-        <div className={`w-full h-32 rounded-lg bg-gradient-to-r ${card.cardColor} flex items-center justify-center shadow-lg mb-4 overflow-hidden`}>
-          <CreditCard className="w-12 h-12 text-white opacity-80" />
+        <div className="w-full h-32 rounded-lg overflow-hidden shadow-lg mb-4">
+          <img 
+            src={card.image} 
+            alt={card.name}
+            className="w-full h-32 object-cover"
+          />
         </div>
       );
     }

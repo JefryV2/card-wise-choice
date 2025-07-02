@@ -29,7 +29,7 @@ const PRE_PROGRAMMED_CARDS = [
     bonusCategory: 'general',
     perks: ['1.5% on all purchases', 'No annual fee', '5% on travel through Chase'],
     creditScore: 'Good (650+)',
-    image: 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?w=400&h=250&fit=crop&crop=center',
+    image: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop&crop=center',
     cardColor: 'from-slate-600 to-slate-800'
   },
   {
@@ -55,7 +55,7 @@ const PRE_PROGRAMMED_CARDS = [
     bonusCategory: 'dining',
     perks: ['4x points on dining & groceries', '$120 dining credit', 'Transfer partners'],
     creditScore: 'Good to Excellent (670+)',
-    image: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop&crop=center',
+    image: 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?w=400&h=250&fit=crop&crop=center',
     cardColor: 'from-yellow-500 to-yellow-700'
   },
   {
@@ -68,7 +68,7 @@ const PRE_PROGRAMMED_CARDS = [
     bonusCategory: 'rotating',
     perks: ['5% rotating categories', '1% on all other purchases', 'Cashback match first year'],
     creditScore: 'Fair to Good (580+)',
-    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=250&fit=crop&crop=center',
+    image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop&crop=center',
     cardColor: 'from-orange-500 to-orange-700'
   },
   {
@@ -81,7 +81,7 @@ const PRE_PROGRAMMED_CARDS = [
     bonusCategory: 'travel',
     perks: ['2x miles on all purchases', 'Transfer partners', 'Global Entry credit'],
     creditScore: 'Good to Excellent (670+)',
-    image: 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?w=400&h=250&fit=crop&crop=center',
+    image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop&crop=center',
     cardColor: 'from-purple-600 to-purple-800'
   }
 ];
@@ -168,8 +168,12 @@ export const CardDropdown = ({ onAddCard, userCards }: { onAddCard: (card: any) 
               {PRE_PROGRAMMED_CARDS.map((card) => (
                 <SelectItem key={card.id} value={card.id}>
                   <div className="flex items-center space-x-3 w-full">
-                    <div className={`w-12 h-8 rounded-md bg-gradient-to-r ${card.cardColor} flex items-center justify-center shadow-sm`}>
-                      <CreditCard className="w-4 h-4 text-white" />
+                    <div className="w-12 h-8 rounded-md overflow-hidden shadow-sm">
+                      <img 
+                        src={card.image} 
+                        alt={card.name}
+                        className="w-12 h-8 object-cover"
+                      />
                     </div>
                     <div>
                       <div className="font-medium">{card.name}</div>
@@ -188,8 +192,12 @@ export const CardDropdown = ({ onAddCard, userCards }: { onAddCard: (card: any) 
                 return card ? (
                   <div className="space-y-4">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-24 h-16 rounded-lg bg-gradient-to-r ${card.cardColor} flex items-center justify-center shadow-lg`}>
-                        <CreditCard className="w-8 h-8 text-white" />
+                      <div className="w-24 h-16 rounded-lg overflow-hidden shadow-lg">
+                        <img 
+                          src={card.image} 
+                          alt={card.name}
+                          className="w-24 h-16 object-cover"
+                        />
                       </div>
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900">{card.name}</h4>
