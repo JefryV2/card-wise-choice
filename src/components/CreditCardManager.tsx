@@ -71,6 +71,38 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }: any) =
     });
   };
 
+  const getCardVisual = (card: any) => {
+    // If card has an image and cardColor (from pre-programmed cards)
+    if (card.image && card.cardColor) {
+      return (
+        <div className={`w-full h-32 rounded-lg bg-gradient-to-r ${card.cardColor} flex items-center justify-center shadow-lg mb-4 overflow-hidden`}>
+          <CreditCard className="w-12 h-12 text-white opacity-80" />
+        </div>
+      );
+    }
+    
+    // Default card visual for manually added cards
+    const getCardColor = (type: string) => {
+      switch (type) {
+        case 'travel': return 'from-blue-500 to-blue-700';
+        case 'cashback': return 'from-green-500 to-green-700';
+        case 'points': return 'from-purple-500 to-purple-700';
+        case 'balance-transfer': return 'from-orange-500 to-orange-700';
+        case 'business': return 'from-gray-500 to-gray-700';
+        default: return 'from-gray-400 to-gray-600';
+      }
+    };
+
+    return (
+      <div className={`w-full h-32 rounded-lg bg-gradient-to-r ${getCardColor(card.type)} flex items-center justify-center shadow-lg mb-4`}>
+        <div className="text-center text-white">
+          <CreditCard className="w-12 h-12 mx-auto mb-2 opacity-80" />
+          <div className="text-xs font-medium opacity-75">{card.bank}</div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-4 md:space-y-6">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-3 md:space-y-0">
@@ -216,8 +248,11 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }: any) =
       {/* Mobile-optimized card display */}
       <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:space-y-0">
         {userCards.map((card: any) => (
-          <Card key={card.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-3">
+          <Card key={card.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+            {/* Card Visual */}
+            {getCardVisual(card)}
+            
+            <CardHeader className="pb-3 pt-0">
               <div className="flex justify-between items-start">
                 <div className="flex-1 min-w-0">
                   <CardTitle className="text-base md:text-lg truncate">{card.name}</CardTitle>
@@ -246,6 +281,7 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }: any) =
                 </div>
               </div>
             </CardHeader>
+            
             <CardContent className={`space-y-3 ${expandedCard === card.id ? 'block' : 'hidden md:block'}`}>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="secondary" className="text-xs">
