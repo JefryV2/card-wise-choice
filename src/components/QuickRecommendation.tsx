@@ -2,61 +2,70 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Target, CreditCard, ArrowRight, Check, MapPin, Clock, TrendingUp, Sparkles, Star } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { CreditCard, Star, TrendingUp, DollarSign, Sparkles, MapPin, Clock, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { detectCategory, getCategoryConfidence, getSuggestedAmount } from "@/utils/categoryDetection";
 
-const QUICK_CATEGORIES = [
-  { id: 'dining', label: 'Dining', icon: '🍽️', description: 'Restaurants & Food', commonAmounts: [25, 50, 75] },
-  { id: 'gas', label: 'Gas', icon: '⛽', description: 'Gas Stations', commonAmounts: [40, 60, 80] },
-  { id: 'groceries', label: 'Groceries', icon: '🛒', description: 'Supermarkets', commonAmounts: [50, 100, 150] },
-  { id: 'travel', label: 'Travel', icon: '✈️', description: 'Hotels & Flights', commonAmounts: [200, 500, 1000] },
-  { id: 'online', label: 'Online', icon: '🛍️', description: 'Online Shopping', commonAmounts: [30, 75, 150] },
-  { id: 'general', label: 'General', icon: '💳', description: 'Everything Else', commonAmounts: [25, 50, 100] }
+const SPENDING_CATEGORIES = [
+  { value: 'dining', label: 'Dining & Restaurants', icon: '🍽️' },
+  { value: 'gas', label: 'Gas Stations', icon: '⛽' },
+  { value: 'groceries', label: 'Groceries', icon: '🛒' },
+  { value: 'travel', label: 'Travel & Hotels', icon: '✈️' },
+  { value: 'online', label: 'Online Shopping', icon: '🛍️' },
+  { value: 'streaming', label: 'Streaming Services', icon: '📺' },
+  { value: 'general', label: 'General Purchases', icon: '💳' }
 ];
 
-const LOCATION_SUGGESTIONS = {
-  dining: ['Nearby restaurants', 'Fast food chains', 'Coffee shops'],
-  gas: ['Shell nearby', 'BP station', 'Costco gas'],
-  groceries: ['Whole Foods', 'Target', 'Local supermarket'],
-  travel: ['Airport purchases', 'Hotel bookings', 'Uber/Lyft'],
-  online: ['Amazon', 'Popular retailers', 'Subscription services']
-};
-
-export const QuickRecommendation = ({ userCards }: { userCards: any[] }) => {
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedAmount, setSelectedAmount] = useState(0);
-  const [customAmount, setCustomAmount] = useState('');
-  const [recommendations, setRecommendations] = useState([]);
-  const [purchaseHistory, setPurchaseHistory] = useState([]);
-  const [showComparison, setShowComparison] = useState(false);
-  const [usePreferences, setUsePreferences] = useState(true);
+export const QuickRecommendation = ({ userCards }) => {
+  const [spendingAmount, setSpendingAmount] = useState('');
+  const [spendingCategory, setSpendingCategory] = useState('');
+  const [merchantInput, setMerchantInput] = useState('');
+  const [detectedCategory, setDetectedCategory] = useState('');
+  const [confidence, setConfidence] = useState(0);
+  const [suggestions, setSuggestions] = useState([]);
+  const [recommendation, setRecommendation] = useState(null);
+  const [comparisonResults, setComparisonResults] = useState([]);
   const { toast } = useToast();
 
-  // Load purchase history from localStorage
+  // Smart category detection when merchant input changes
   useEffect(() => {
-    const history = localStorage.getItem('purchaseHistory');
-    if (history) {
-      setPurchaseHistory(JSON.parse(history));
+    if (merchantInput.trim()) {
+      const detected = detectCategory(merchantInput);
+      if (detected) {
+        setDetectedCategory(detected);
+        const conf = getCategoryConfidence(merchantInput, detected);
+        setConfidence(conf);
+        
+        // Auto-select category if confidence is high
+        if (conf > 50) {
+          setSpendingCategory(detected);
+          const amounts = getSuggestedAmount(detected);
+          setSuggestions(amounts);
+        }
+      } else {
+        setDetectedCategory('');
+        setConfidence(0);
+      }
     }
-  }, []);
+  }, [merchantInput]);
 
-  const getSmartAmountSuggestions = (category: string) => {
-    const categoryData = QUICK_CATEGORIES.find(cat => cat.id === category);
-    const recentPurchases = purchaseHistory
-      .filter((p: any) => p.category === category)
-      .slice(0, 3)
-      .map((p: any) => p.amount);
-    
-    return [...new Set([...categoryData?.commonAmounts || [], ...recentPurchases])].sort((a, b) => a - b);
-  };
+  // Update suggestions when category changes
+  useEffect(() => {
+    if (spendingCategory) {
+      const amounts = getSuggestedAmount(spendingCategory);
+      setSuggestions(amounts);
+    }
+  }, [spendingCategory]);
 
-  const getMultipleRecommendations = () => {
-    if (!selectedCategory || (!selectedAmount && !customAmount)) {
+  const getRecommendation = () => {
+    if (!spendingAmount || !spendingCategory) {
       toast({
-        title: "Missing Details 🤔",
-        description: "Please select a category and amount to get smart recommendations.",
+        title: "Missing Information",
+        description: "Please enter spending amount and select a category.",
         variant: "destructive"
       });
       return;
@@ -64,349 +73,283 @@ export const QuickRecommendation = ({ userCards }: { userCards: any[] }) => {
 
     if (userCards.length === 0) {
       toast({
-        title: "No Cards Yet 💳",
-        description: "Add your credit cards first to unlock personalized magic!",
+        title: "No Cards Available",
+        description: "Please add your credit cards first to get recommendations.",
         variant: "destructive"
       });
       return;
     }
 
-    const amount = customAmount ? parseFloat(customAmount) : selectedAmount;
-    const allRecommendations = getAllCardRecommendations(amount, selectedCategory, userCards);
-    setRecommendations(allRecommendations);
-    setShowComparison(true);
+    // Enhanced recommendation with comparison
+    const results = compareAllCards(parseFloat(spendingAmount), spendingCategory, userCards);
+    setComparisonResults(results);
+    
+    const bestCard = results[0];
+    setRecommendation({
+      card: bestCard.card,
+      estimatedReward: bestCard.reward,
+      rewardType: bestCard.card.type === 'cashback' ? 'cashback' : 'points',
+      reasoning: generateReasoning(bestCard.card, spendingCategory, bestCard.reward, merchantInput),
+      confidence: confidence
+    });
 
-    // Save to purchase history
-    const newPurchase = {
-      category: selectedCategory,
-      amount,
-      timestamp: Date.now(),
-      recommendedCard: allRecommendations[0]?.card.name
-    };
-    const updatedHistory = [newPurchase, ...purchaseHistory.slice(0, 9)];
-    setPurchaseHistory(updatedHistory);
-    localStorage.setItem('purchaseHistory', JSON.stringify(updatedHistory));
+    // Success toast with personality
+    toast({
+      title: "🎯 Perfect Match Found!",
+      description: `Your ${bestCard.card.name} will earn you $${bestCard.reward.toFixed(2)}!`,
+    });
   };
 
-  const getAllCardRecommendations = (amount: number, category: string, cards: any[]) => {
-    const recommendations = cards.map(card => {
+  const compareAllCards = (amount, category, cards) => {
+    return cards.map(card => {
       let rewardRate = parseFloat(card.rewardRate) || 1.0;
-      let bonusMultiplier = 1;
       
       // Enhanced bonus logic
       if (card.bonusCategory === category) {
-        bonusMultiplier = 2.5;
-        rewardRate *= bonusMultiplier;
+        rewardRate *= 2.5;
       }
 
-      const estimatedReward = amount * (rewardRate / 100);
+      const reward = amount * (rewardRate / 100);
       
       return {
         card,
-        estimatedReward,
-        rewardRate: rewardRate,
-        bonusMultiplier,
-        category: QUICK_CATEGORIES.find(cat => cat.id === category),
-        amount
+        reward,
+        rewardRate,
+        isBonus: card.bonusCategory === category
       };
-    });
-
-    return recommendations.sort((a, b) => b.estimatedReward - a.estimatedReward);
+    }).sort((a, b) => b.reward - a.reward);
   };
 
-  const resetRecommendation = () => {
-    setRecommendations([]);
-    setSelectedCategory('');
-    setSelectedAmount(0);
-    setCustomAmount('');
-    setShowComparison(false);
-  };
-
-  const getRecentCategoryInsight = (category: string) => {
-    const recentPurchases = purchaseHistory.filter((p: any) => p.category === category);
-    if (recentPurchases.length === 0) return null;
+  const generateReasoning = (card, category, reward, merchant) => {
+    const selectedCategory = SPENDING_CATEGORIES.find(cat => cat.value === category);
+    const merchantText = merchant ? ` at ${merchant}` : '';
     
-    const avgAmount = recentPurchases.reduce((sum: number, p: any) => sum + p.amount, 0) / recentPurchases.length;
-    return `💡 You usually spend ~$${Math.round(avgAmount)} on ${QUICK_CATEGORIES.find(c => c.id === category)?.label.toLowerCase()}`;
+    if (card.bonusCategory === category) {
+      return `${card.name} offers bonus rewards for ${selectedCategory?.label.toLowerCase()}${merchantText}, making it your top earning choice! 🚀`;
+    } else {
+      return `${card.name} has the highest base reward rate among your cards${merchantText}, maximizing your earnings for this purchase. 💰`;
+    }
   };
 
-  if (showComparison && recommendations.length > 0) {
-    const topCard = recommendations[0];
-    
-    return (
-      <div className="space-y-4 animate-fade-in">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 flex items-center">
-              Your Smart Recommendations 
-              <Sparkles className="w-5 h-5 ml-2 text-yellow-500" />
-            </h2>
-            <p className="text-sm text-gray-600">Ranked by potential rewards</p>
-          </div>
-          <Button variant="ghost" size="sm" onClick={resetRecommendation} className="hover:bg-gray-100">
-            ✨ New Search
-          </Button>
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <div className="text-center">
+        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <Zap className="w-8 h-8 text-white" />
         </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">🎯 Smart Card Finder</h2>
+        <p className="text-gray-600">Tell us where you're shopping, and we'll find your best card instantly!</p>
+      </div>
 
-        {/* Top Recommendation - Hero Card */}
-        <Card className="bg-gradient-to-r from-gray-900 to-gray-800 text-white border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-bold flex items-center">
-                  🏆 {topCard.card.name}
-                </h3>
-                <p className="text-gray-300">{topCard.card.bank}</p>
-              </div>
-              <Badge className="bg-yellow-500 text-yellow-900 font-bold">
-                Best Choice
-              </Badge>
-            </div>
+      <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-pink-50 shadow-lg hover:shadow-xl transition-all duration-300">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Sparkles className="h-5 w-5 mr-2 text-yellow-500" />
+            Smart Purchase Detection
+          </CardTitle>
+          <CardDescription>
+            Just tell us where you're shopping - we'll handle the rest! ✨
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Smart Merchant Input */}
+          <div>
+            <Label htmlFor="merchant" className="flex items-center mb-2">
+              <MapPin className="h-4 w-4 mr-1 text-purple-500" />
+              Where are you shopping?
+            </Label>
+            <Input
+              id="merchant"
+              value={merchantInput}
+              onChange={(e) => setMerchantInput(e.target.value)}
+              placeholder="e.g., Starbucks, Shell Gas Station, Target..."
+              className="transition-all duration-200 focus:ring-2 focus:ring-purple-500"
+            />
             
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-3xl font-bold text-green-400">
-                  ${topCard.estimatedReward.toFixed(2)}
-                </div>
-                <div className="text-gray-300 text-sm">You'll earn</div>
-              </div>
-              
-              <div className="text-right">
-                <div className="text-lg font-bold text-blue-400">
-                  {topCard.rewardRate.toFixed(1)}% rate
-                </div>
-                <div className="text-gray-300 text-sm">
-                  {topCard.bonusMultiplier > 1 ? '🔥 Bonus category!' : 'Base rate'}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-gray-700">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-400">Purchase:</span>
-                <span className="text-gray-300">
-                  {topCard.category?.icon} {topCard.category?.label} • ${topCard.amount}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Location-Based Tips */}
-        {LOCATION_SUGGESTIONS[selectedCategory as keyof typeof LOCATION_SUGGESTIONS] && (
-          <Card className="border-0 bg-blue-50">
-            <CardContent className="p-4">
-              <div className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-blue-600 mt-0.5" />
-                <div>
-                  <div className="font-medium text-blue-900">📍 Popular nearby options</div>
-                  <div className="text-sm text-blue-700 mt-1">
-                    {LOCATION_SUGGESTIONS[selectedCategory as keyof typeof LOCATION_SUGGESTIONS]?.join(' • ')}
+            {/* Detection Results */}
+            {detectedCategory && (
+              <div className="mt-2 p-3 bg-green-50 rounded-lg border border-green-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <span className="text-green-600 font-medium">
+                      🤖 Detected: {SPENDING_CATEGORIES.find(c => c.value === detectedCategory)?.label}
+                    </span>
                   </div>
+                  <Badge variant="secondary" className="bg-green-100 text-green-700">
+                    {confidence.toFixed(0)}% confident
+                  </Badge>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Amount Input with Smart Suggestions */}
+            <div>
+              <Label htmlFor="amount" className="flex items-center mb-2">
+                <DollarSign className="h-4 w-4 mr-1 text-green-500" />
+                Spending Amount
+              </Label>
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                value={spendingAmount}
+                onChange={(e) => setSpendingAmount(e.target.value)}
+                placeholder="100.00"
+                className="transition-all duration-200 focus:ring-2 focus:ring-green-500"
+              />
+              
+              {/* Smart Amount Suggestions */}
+              {suggestions.length > 0 && (
+                <div className="mt-2">
+                  <div className="text-xs text-gray-500 mb-1">💡 Popular amounts:</div>
+                  <div className="flex flex-wrap gap-1">
+                    {suggestions.map((amount) => (
+                      <Button
+                        key={amount}
+                        variant="outline"
+                        size="sm"
+                        className="h-6 px-2 text-xs hover:bg-green-50 hover:border-green-300 transition-all duration-200"
+                        onClick={() => setSpendingAmount(amount.toString())}
+                      >
+                        ${amount}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Category Selection */}
+            <div>
+              <Label htmlFor="category" className="flex items-center mb-2">
+                <Star className="h-4 w-4 mr-1 text-blue-500" />
+                Category
+              </Label>
+              <Select value={spendingCategory} onValueChange={setSpendingCategory}>
+                <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SPENDING_CATEGORIES.map((category) => (
+                    <SelectItem key={category.value} value={category.value}>
+                      <span className="flex items-center">
+                        <span className="mr-2">{category.icon}</span>
+                        {category.label}
+                        {category.value === detectedCategory && (
+                          <Badge className="ml-2 bg-green-100 text-green-700 text-xs">
+                            AI Pick
+                          </Badge>
+                        )}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <Button 
+            onClick={getRecommendation}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+            size="lg"
+          >
+            <TrendingUp className="h-5 w-5 mr-2" />
+            🚀 Find My Best Card
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Results Section */}
+      {recommendation && (
+        <div className="space-y-4">
+          {/* Winner Card */}
+          <Card className="border-2 border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.01]">
+            <CardHeader>
+              <CardTitle className="flex items-center text-green-800">
+                <CreditCard className="h-5 w-5 mr-2" />
+                🏆 Your Best Choice
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">{recommendation.card.name}</h3>
+                    <p className="text-gray-600">{recommendation.card.bank}</p>
+                  </div>
+                  <div className="text-right">
+                    <Badge className="bg-green-100 text-green-800 mb-1">Winner</Badge>
+                    <div className="text-2xl font-bold text-green-600">
+                      ${recommendation.estimatedReward.toFixed(2)}
+                    </div>
+                    <div className="text-sm text-gray-500">earned</div>
+                  </div>
+                </div>
+                
+                <div className="bg-green-50 rounded-lg p-3">
+                  <h4 className="font-medium text-green-900 mb-1 flex items-center">
+                    <Sparkles className="h-4 w-4 mr-1" />
+                    Why this card rocks:
+                  </h4>
+                  <p className="text-sm text-green-800">{recommendation.reasoning}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-        )}
 
-        {/* Alternative Recommendations */}
-        {recommendations.length > 1 && (
-          <div className="space-y-3">
-            <h3 className="font-medium text-gray-900">Alternative options</h3>
-            {recommendations.slice(1, 3).map((rec, index) => (
-              <Card key={index} className="border-0 bg-white shadow-sm hover:shadow-md transition-all duration-200">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium text-gray-900">{rec.card.name}</div>
-                      <div className="text-sm text-gray-500">{rec.card.bank}</div>
+          {/* Comparison Results */}
+          {comparisonResults.length > 1 && (
+            <Card className="border border-blue-200 bg-blue-50">
+              <CardHeader>
+                <CardTitle className="flex items-center text-blue-800">
+                  <Clock className="h-5 w-5 mr-2" />
+                  📊 All Your Cards Compared
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {comparisonResults.map((result, index) => (
+                    <div key={result.card.id} className="bg-white rounded-lg p-3 flex justify-between items-center shadow-sm">
+                      <div className="flex items-center">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-3 ${
+                          index === 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          #{index + 1}
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-900">{result.card.name}</div>
+                          <div className="text-sm text-gray-500">
+                            {result.rewardRate.toFixed(1)}% rate
+                            {result.isBonus && <span className="text-green-600 ml-1">🎯 Bonus!</span>}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-gray-900">${result.reward.toFixed(2)}</div>
+                        <div className="text-xs text-gray-500">reward</div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold text-gray-900">${rec.estimatedReward.toFixed(2)}</div>
-                      <div className="text-xs text-gray-500">{rec.rewardRate.toFixed(1)}% rate</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Ready to Pay CTA */}
-        <Card className="border-0 bg-green-50">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <Check className="w-5 h-5 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <div className="font-medium text-green-900">🎯 Ready to maximize rewards?</div>
-                <div className="text-sm text-green-700">Use your {topCard.card.name} for this purchase</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const smartAmounts = selectedCategory ? getSmartAmountSuggestions(selectedCategory) : [];
-  const categoryInsight = selectedCategory ? getRecentCategoryInsight(selectedCategory) : null;
-
-  return (
-    <div className="space-y-6 animate-fade-in">
-      <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-2 flex items-center">
-          Smart Recommendation ✨
-        </h2>
-        <p className="text-gray-600 text-sm">AI-powered suggestions based on your spending patterns</p>
-      </div>
-
-      {/* Preference Toggle */}
-      <Card className="border-0 bg-gradient-to-r from-blue-50 to-purple-50">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="font-medium text-gray-900 flex items-center">
-                🎯 Smart preferences
-                <Sparkles className="w-4 h-4 ml-1 text-purple-500" />
-              </div>
-              <div className="text-xs text-gray-500">Uses your history & goals for better suggestions</div>
-            </div>
-            <Button
-              variant={usePreferences ? "default" : "outline"}
-              size="sm"
-              onClick={() => setUsePreferences(!usePreferences)}
-              className={usePreferences ? "bg-purple-600 hover:bg-purple-700" : ""}
-            >
-              {usePreferences ? "ON" : "OFF"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Category Selection */}
-      <div>
-        <h3 className="font-medium text-gray-900 mb-3 flex items-center">
-          🛍️ What are you buying?
-        </h3>
-        <div className="grid grid-cols-2 gap-3">
-          {QUICK_CATEGORIES.map((category) => (
-            <Button
-              key={category.id}
-              variant={selectedCategory === category.id ? "default" : "outline"}
-              className={`h-16 justify-start transition-all duration-200 ${
-                selectedCategory === category.id 
-                  ? "bg-gray-900 text-white shadow-lg scale-105" 
-                  : "bg-white border-gray-200 hover:bg-gray-50 hover:scale-102"
-              }`}
-              onClick={() => setSelectedCategory(category.id)}
-            >
-              <div className="text-left">
-                <div className="flex items-center space-x-2">
-                  <span>{category.icon}</span>
-                  <span className="font-medium">{category.label}</span>
+                  ))}
                 </div>
-                <div className="text-xs opacity-70">{category.description}</div>
-              </div>
-            </Button>
-          ))}
+              </CardContent>
+            </Card>
+          )}
         </div>
-        
-        {categoryInsight && (
-          <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-            <div className="text-sm text-blue-800">{categoryInsight}</div>
-          </div>
-        )}
-      </div>
-
-      {/* Smart Amount Selection */}
-      {selectedCategory && (
-        <div>
-          <h3 className="font-medium text-gray-900 mb-3 flex items-center">
-            💰 How much are you spending?
-          </h3>
-          
-          {/* Smart Amount Suggestions */}
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            {smartAmounts.slice(0, 6).map((amount) => (
-              <Button
-                key={amount}
-                variant={selectedAmount === amount ? "default" : "outline"}
-                className={`h-12 transition-all duration-200 ${
-                  selectedAmount === amount 
-                    ? "bg-gray-900 text-white shadow-md scale-105" 
-                    : "bg-white border-gray-200 hover:bg-gray-50"
-                }`}
-                onClick={() => {
-                  setSelectedAmount(amount);
-                  setCustomAmount('');
-                }}
-              >
-                ${amount}
-              </Button>
-            ))}
-          </div>
-
-          {/* Custom Amount Input */}
-          <div className="space-y-2">
-            <div className="text-sm text-gray-600">Or enter custom amount:</div>
-            <Input
-              type="number"
-              placeholder="Enter amount..."
-              value={customAmount}
-              onChange={(e) => {
-                setCustomAmount(e.target.value);
-                setSelectedAmount(0);
-              }}
-              className="bg-white border-gray-200"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Get Recommendation Button */}
-      <Button 
-        onClick={getMultipleRecommendations}
-        className="w-full bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 h-12 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-        disabled={!selectedCategory || (!selectedAmount && !customAmount)}
-      >
-        <Target className="w-4 h-4 mr-2" />
-        ✨ Get Smart Recommendations
-      </Button>
-
-      {/* Recent Purchase History */}
-      {purchaseHistory.length > 0 && (
-        <Card className="border-0 bg-gray-50">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2 mb-3">
-              <Clock className="w-4 h-4 text-gray-600" />
-              <div className="font-medium text-gray-900">Recent purchases</div>
-            </div>
-            <div className="space-y-2">
-              {purchaseHistory.slice(0, 3).map((purchase: any, index) => (
-                <div key={index} className="flex justify-between items-center text-sm">
-                  <div className="flex items-center space-x-2">
-                    <span>{QUICK_CATEGORIES.find(c => c.id === purchase.category)?.icon}</span>
-                    <span className="text-gray-700">
-                      {QUICK_CATEGORIES.find(c => c.id === purchase.category)?.label}
-                    </span>
-                  </div>
-                  <div className="text-gray-600">${purchase.amount}</div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       )}
 
       {/* Empty State */}
       {userCards.length === 0 && (
-        <Card className="border-0 bg-gradient-to-br from-blue-50 to-purple-50">
-          <CardContent className="p-6 text-center">
-            <CreditCard className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <h3 className="font-bold text-gray-900 mb-1">🚀 Ready to get started?</h3>
-            <p className="text-gray-600 text-sm">Add your credit cards to unlock AI-powered recommendations</p>
+        <Card className="text-center py-12 border-2 border-dashed border-gray-300">
+          <CardContent>
+            <CreditCard className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              🚀 Ready to Get Started?
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Add your credit cards first to unlock smart recommendations!
+            </p>
           </CardContent>
         </Card>
       )}
