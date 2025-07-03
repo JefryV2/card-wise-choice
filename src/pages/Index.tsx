@@ -2,13 +2,16 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Plus, Home, Target, Scan, User, Settings as SettingsIcon, ArrowRight, Sparkles } from "lucide-react";
+import { CreditCard, Plus, Home, Target, Scan, User, Settings as SettingsIcon, ArrowRight, Sparkles, BarChart3, Receipt, DollarSign } from "lucide-react";
 import { CreditCardManager } from "@/components/CreditCardManager";
 import { QuickRecommendation } from "@/components/QuickRecommendation";
 import { RewardsDashboard } from "@/components/RewardsDashboard";
 import { AICardScanner } from "@/components/AICardScanner";
 import { CardDropdown } from "@/components/CardDropdown";
 import { Settings } from "@/components/Settings";
+import { TransactionHistory } from "@/components/TransactionHistory";
+import { SpendingAnalytics } from "@/components/SpendingAnalytics";
+import { BudgetTracking } from "@/components/BudgetTracking";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -121,6 +124,57 @@ const Index = () => {
                 <Button
                   variant="outline"
                   className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                  onClick={() => setActiveTab('transactions')}
+                >
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mr-3">
+                      <Receipt className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium text-gray-900">📝 Transaction History</div>
+                      <div className="text-xs text-gray-500">View your spending activity</div>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                  onClick={() => setActiveTab('analytics')}
+                >
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center mr-3">
+                      <BarChart3 className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium text-gray-900">📊 Spending Analytics</div>
+                      <div className="text-xs text-gray-500">Analyze your spending patterns</div>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                  onClick={() => setActiveTab('budget')}
+                >
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center mr-3">
+                      <DollarSign className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium text-gray-900">💰 Budget Tracking</div>
+                      <div className="text-xs text-gray-500">Monitor spending goals</div>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
                   onClick={() => setActiveTab('scan')}
                 >
                   <div className="flex items-center">
@@ -216,6 +270,51 @@ const Index = () => {
           </div>
         )}
 
+        {activeTab === 'transactions' && (
+          <div className="p-4 animate-fade-in">
+            <div className="mb-4">
+              <Button
+                variant="ghost"
+                onClick={() => setActiveTab('home')}
+                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+              >
+                ← Back to Home
+              </Button>
+            </div>
+            <TransactionHistory />
+          </div>
+        )}
+
+        {activeTab === 'analytics' && (
+          <div className="p-4 animate-fade-in">
+            <div className="mb-4">
+              <Button
+                variant="ghost"
+                onClick={() => setActiveTab('home')}
+                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+              >
+                ← Back to Home
+              </Button>
+            </div>
+            <SpendingAnalytics />
+          </div>
+        )}
+
+        {activeTab === 'budget' && (
+          <div className="p-4 animate-fade-in">
+            <div className="mb-4">
+              <Button
+                variant="ghost"
+                onClick={() => setActiveTab('home')}
+                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+              >
+                ← Back to Home
+              </Button>
+            </div>
+            <BudgetTracking />
+          </div>
+        )}
+
         {activeTab === 'cards' && (
           <div className="p-4 space-y-6 animate-fade-in">
             <div className="mb-4">
@@ -298,15 +397,39 @@ const Index = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('recommend')}
+            onClick={() => setActiveTab('transactions')}
             className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
-              activeTab === 'recommend' 
+              activeTab === 'transactions' 
                 ? 'bg-gray-100 text-gray-900 shadow-sm' 
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <Target className="w-5 h-5" />
-            <span className="text-xs font-medium">Find</span>
+            <Receipt className="w-5 h-5" />
+            <span className="text-xs font-medium">History</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
+              activeTab === 'analytics' 
+                ? 'bg-gray-100 text-gray-900 shadow-sm' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <BarChart3 className="w-5 h-5" />
+            <span className="text-xs font-medium">Analytics</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('budget')}
+            className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
+              activeTab === 'budget' 
+                ? 'bg-gray-100 text-gray-900 shadow-sm' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <DollarSign className="w-5 h-5" />
+            <span className="text-xs font-medium">Budget</span>
           </button>
 
           <button
@@ -319,30 +442,6 @@ const Index = () => {
           >
             <CreditCard className="w-5 h-5" />
             <span className="text-xs font-medium">Cards</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('rewards')}
-            className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
-              activeTab === 'rewards' 
-                ? 'bg-gray-100 text-gray-900 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <User className="w-5 h-5" />
-            <span className="text-xs font-medium">Rewards</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
-              activeTab === 'settings' 
-                ? 'bg-gray-100 text-gray-900 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <SettingsIcon className="w-5 h-5" />
-            <span className="text-xs font-medium">Settings</span>
           </button>
         </div>
       </div>
