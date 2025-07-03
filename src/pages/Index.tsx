@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Plus, Home, Target, Scan, User, Settings as SettingsIcon, ArrowRight, Sparkles, BarChart3, Receipt, DollarSign } from "lucide-react";
+import { CreditCard, Plus, Home, Target, Scan, User, Settings as SettingsIcon, ArrowRight, Sparkles, BarChart3, Receipt, DollarSign, Upload, Download } from "lucide-react";
 import { CreditCardManager } from "@/components/CreditCardManager";
 import { QuickRecommendation } from "@/components/QuickRecommendation";
 import { RewardsDashboard } from "@/components/RewardsDashboard";
@@ -12,6 +11,8 @@ import { Settings } from "@/components/Settings";
 import { TransactionHistory } from "@/components/TransactionHistory";
 import { SpendingAnalytics } from "@/components/SpendingAnalytics";
 import { BudgetTracking } from "@/components/BudgetTracking";
+import { BankRecordUpload } from "@/components/BankRecordUpload";
+import { DataExport } from "@/components/DataExport";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -133,6 +134,40 @@ const Index = () => {
                     <div className="text-left">
                       <div className="font-medium text-gray-900">📝 Transaction History</div>
                       <div className="text-xs text-gray-500">View your spending activity</div>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                  onClick={() => setActiveTab('upload')}
+                >
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mr-3">
+                      <Upload className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium text-gray-900">📤 Upload Bank Records</div>
+                      <div className="text-xs text-gray-500">Import transaction history</div>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                  onClick={() => setActiveTab('export')}
+                >
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-lg flex items-center justify-center mr-3">
+                      <Download className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium text-gray-900">📊 Export Data</div>
+                      <div className="text-xs text-gray-500">Download reports by category/card</div>
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-gray-400" />
@@ -267,6 +302,36 @@ const Index = () => {
               </Button>
             </div>
             <QuickRecommendation userCards={userCards} />
+          </div>
+        )}
+
+        {activeTab === 'upload' && (
+          <div className="p-4 animate-fade-in">
+            <div className="mb-4">
+              <Button
+                variant="ghost"
+                onClick={() => setActiveTab('home')}
+                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+              >
+                ← Back to Home
+              </Button>
+            </div>
+            <BankRecordUpload />
+          </div>
+        )}
+
+        {activeTab === 'export' && (
+          <div className="p-4 animate-fade-in">
+            <div className="mb-4">
+              <Button
+                variant="ghost"
+                onClick={() => setActiveTab('home')}
+                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+              >
+                ← Back to Home
+              </Button>
+            </div>
+            <DataExport />
           </div>
         )}
 
@@ -409,27 +474,27 @@ const Index = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('analytics')}
+            onClick={() => setActiveTab('upload')}
             className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
-              activeTab === 'analytics' 
+              activeTab === 'upload' 
                 ? 'bg-gray-100 text-gray-900 shadow-sm' 
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <BarChart3 className="w-5 h-5" />
-            <span className="text-xs font-medium">Analytics</span>
+            <Upload className="w-5 h-5" />
+            <span className="text-xs font-medium">Upload</span>
           </button>
 
           <button
-            onClick={() => setActiveTab('budget')}
+            onClick={() => setActiveTab('export')}
             className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
-              activeTab === 'budget' 
+              activeTab === 'export' 
                 ? 'bg-gray-100 text-gray-900 shadow-sm' 
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <DollarSign className="w-5 h-5" />
-            <span className="text-xs font-medium">Budget</span>
+            <Download className="w-5 h-5" />
+            <span className="text-xs font-medium">Export</span>
           </button>
 
           <button
