@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Plus, Home, Target, Scan, User, Settings as SettingsIcon, ArrowRight, Sparkles, BarChart3, Receipt, DollarSign, Upload, Download, TrendingUp, PieChart, Wallet, FileText, Database, Activity } from "lucide-react";
+import { ArrowRight, Sparkles, BarChart3, FileText, DollarSign, Download, TrendingUp, PieChart, Wallet, Database, Activity, Target, Scan, SettingsIcon as Settings, Home, Plus } from "lucide-react";
 import { CreditCardManager } from "@/components/CreditCardManager";
 import { QuickRecommendation } from "@/components/QuickRecommendation";
 import { RewardsDashboard } from "@/components/RewardsDashboard";
 import { AICardScanner } from "@/components/AICardScanner";
 import { CardDropdown } from "@/components/CardDropdown";
-import { Settings } from "@/components/Settings";
+import { Settings as SettingsComponent } from "@/components/Settings";
 import { TransactionHistory } from "@/components/TransactionHistory";
 import { SpendingAnalytics } from "@/components/SpendingAnalytics";
 import { BudgetTracking } from "@/components/BudgetTracking";
@@ -49,7 +49,7 @@ const Index = () => {
           className="w-10 h-10 p-0 hover:bg-gray-100 rounded-full transition-all duration-200"
           onClick={() => setActiveTab('settings')}
         >
-          <SettingsIcon className="w-4 h-4 text-gray-600" />
+          <Settings className="w-4 h-4 text-gray-600" />
         </Button>
       </header>
 
@@ -62,8 +62,8 @@ const Index = () => {
               <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <Activity className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back! 👋</h2>
-              <p className="text-gray-600">Ready to maximize your rewards today?</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to CardWise! 👋</h2>
+              <p className="text-gray-600">Your smart companion for maximizing credit card rewards</p>
             </div>
 
             {/* Quick Stats */}
@@ -78,17 +78,17 @@ const Index = () => {
               
               <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-emerald-600">$247</div>
-                  <div className="text-xs text-gray-500">This Month</div>
-                  <div className="text-xs text-emerald-500 font-medium">+12% ↗</div>
+                  <div className="text-2xl font-bold text-emerald-600">$0</div>
+                  <div className="text-xs text-gray-500">Rewards</div>
+                  <div className="text-xs text-gray-400">Get started</div>
                 </CardContent>
               </Card>
               
               <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-600">2.1%</div>
-                  <div className="text-xs text-gray-500">Avg Rate</div>
-                  <div className="w-2 h-2 bg-blue-400 rounded-full mx-auto mt-1"></div>
+                  <div className="text-2xl font-bold text-blue-600">0</div>
+                  <div className="text-xs text-gray-500">Transactions</div>
+                  <div className="text-xs text-gray-400">Coming soon</div>
                 </CardContent>
               </Card>
             </div>
@@ -96,83 +96,131 @@ const Index = () => {
             {/* Primary Actions */}
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-gray-900 flex items-center">
-                What would you like to do? 
+                Let's get you started! 
                 <Sparkles className="w-4 h-4 ml-2 text-yellow-500" />
               </h3>
               
-              {/* Get Recommendation - Primary CTA */}
-              <Card className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-xl font-bold mb-1 flex items-center">
-                        🎯 Get Card Recommendation
-                      </h3>
-                      <p className="text-emerald-100 text-sm">Find the perfect card for your purchase</p>
-                    </div>
-                    <Button 
-                      onClick={() => setActiveTab('recommend')}
-                      className="bg-white text-emerald-700 hover:bg-emerald-50 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+              {/* Get Started Flow */}
+              {userCards.length === 0 ? (
+                <>
+                  <Card className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-xl font-bold mb-1 flex items-center">
+                            🚀 Add Your First Card
+                          </h3>
+                          <p className="text-emerald-100 text-sm">Start by adding your credit cards to unlock all features</p>
+                        </div>
+                        <Button 
+                          onClick={() => setActiveTab('cards')}
+                          className="bg-white text-emerald-700 hover:bg-emerald-50 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    <Button
+                      variant="outline"
+                      className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                      onClick={() => setActiveTab('scan')}
                     >
-                      <ArrowRight className="w-4 h-4" />
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center mr-3">
+                          <Scan className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <div className="font-medium text-gray-900">✨ Scan Card with AI</div>
+                          <div className="text-xs text-gray-500">Quick setup using camera</div>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-gray-400" />
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                      onClick={() => setActiveTab('upload')}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-500 rounded-lg flex items-center justify-center mr-3">
+                          <Database className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <div className="font-medium text-gray-900">📤 Upload Bank Records</div>
+                          <div className="text-xs text-gray-500">Import your transaction history</div>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-gray-400" />
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </>
+              ) : (
+                <>
+                  {/* Get Recommendation - Primary CTA */}
+                  <Card className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-xl font-bold mb-1 flex items-center">
+                            🎯 Get Card Recommendation
+                          </h3>
+                          <p className="text-emerald-100 text-sm">Find the perfect card for your next purchase</p>
+                        </div>
+                        <Button 
+                          onClick={() => setActiveTab('recommend')}
+                          className="bg-white text-emerald-700 hover:bg-emerald-50 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                        >
+                          <ArrowRight className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-              {/* Secondary Actions */}
+                  {/* Secondary Actions */}
+                  <div className="grid grid-cols-1 gap-3">
+                    <Button
+                      variant="outline"
+                      className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                      onClick={() => setActiveTab('transactions')}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center mr-3">
+                          <FileText className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <div className="font-medium text-gray-900">📝 Transaction History</div>
+                          <div className="text-xs text-gray-500">View your spending activity</div>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-gray-400" />
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                      onClick={() => setActiveTab('rewards')}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
+                          <TrendingUp className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <div className="font-medium text-gray-900">🏆 View Rewards</div>
+                          <div className="text-xs text-gray-500">Track your earnings</div>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-gray-400" />
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {/* Always Available Actions */}
               <div className="grid grid-cols-1 gap-3">
-                <Button
-                  variant="outline"
-                  className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
-                  onClick={() => setActiveTab('transactions')}
-                >
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center mr-3">
-                      <FileText className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <div className="font-medium text-gray-900">📝 Transaction History</div>
-                      <div className="text-xs text-gray-500">View your spending activity</div>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
-                  onClick={() => setActiveTab('upload')}
-                >
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-500 rounded-lg flex items-center justify-center mr-3">
-                      <Database className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <div className="font-medium text-gray-900">📤 Upload Bank Records</div>
-                      <div className="text-xs text-gray-500">Import transaction history</div>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
-                  onClick={() => setActiveTab('export')}
-                >
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-lg flex items-center justify-center mr-3">
-                      <Download className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <div className="font-medium text-gray-900">📊 Export Data</div>
-                      <div className="text-xs text-gray-500">Download reports by category/card</div>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                </Button>
-
                 <Button
                   variant="outline"
                   className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
@@ -201,41 +249,7 @@ const Index = () => {
                     </div>
                     <div className="text-left">
                       <div className="font-medium text-gray-900">💰 Budget Tracking</div>
-                      <div className="text-xs text-gray-500">Monitor spending goals</div>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
-                  onClick={() => setActiveTab('scan')}
-                >
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center mr-3">
-                      <Scan className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <div className="font-medium text-gray-900">✨ Add Card with AI</div>
-                      <div className="text-xs text-gray-500">Scan card details automatically</div>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
-                  onClick={() => setActiveTab('cards')}
-                >
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-br from-slate-500 to-gray-600 rounded-lg flex items-center justify-center mr-3">
-                      <Wallet className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <div className="font-medium text-gray-900">💳 Manage My Cards</div>
-                      <div className="text-xs text-gray-500">Add, view, or remove cards</div>
+                      <div className="text-xs text-gray-500">Set and monitor spending goals</div>
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-gray-400" />
@@ -244,15 +258,15 @@ const Index = () => {
                 <Button
                   variant="outline"
                   className="h-16 justify-between bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
-                  onClick={() => setActiveTab('rewards')}
+                  onClick={() => setActiveTab('export')}
                 >
                   <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
-                      <TrendingUp className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-lg flex items-center justify-center mr-3">
+                      <Download className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-left">
-                      <div className="font-medium text-gray-900">🏆 View Rewards</div>
-                      <div className="text-xs text-gray-500">Track your earnings</div>
+                      <div className="font-medium text-gray-900">📊 Export Data</div>
+                      <div className="text-xs text-gray-500">Download your financial reports</div>
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-gray-400" />
@@ -260,15 +274,15 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Empty State / Getting Started */}
+            {/* Getting Started Card for Empty State */}
             {userCards.length === 0 && (
               <Card className="border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-sm">
                 <CardContent className="p-6 text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Wallet className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="font-bold text-gray-900 mb-1">🚀 Let's Get Started!</h3>
-                  <p className="text-gray-600 text-sm mb-4">Add your first card to unlock personalized magic</p>
+                  <h3 className="font-bold text-gray-900 mb-1">🚀 Ready to Get Started?</h3>
+                  <p className="text-gray-600 text-sm mb-4">Add your credit cards to unlock personalized recommendations and reward tracking</p>
                   <div className="flex space-x-2">
                     <Button 
                       onClick={() => setActiveTab('scan')}
@@ -441,7 +455,7 @@ const Index = () => {
                 ← Back to Home
               </Button>
             </div>
-            <Settings />
+            <SettingsComponent />
           </div>
         )}
       </main>
