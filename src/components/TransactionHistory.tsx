@@ -1,13 +1,12 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, CreditCard, Filter, Search, TrendingDown, TrendingUp, ArrowUpDown } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Search } from "lucide-react";
+import { TransactionSummary } from "./TransactionSummary";
+import { TransactionFilters } from "./TransactionFilters";
+import { TransactionCard } from "./TransactionCard";
 
-// Realistic transaction data
+// Realistic transaction data generator
 const generateTransactions = () => {
   const categories = [
     { name: 'Dining', icon: '🍽️', color: 'bg-orange-100 text-orange-700' },
@@ -119,106 +118,30 @@ export const TransactionHistory = () => {
         <p className="text-gray-600">Track your spending and rewards</p>
       </div>
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-gray-900">{filteredTransactions.length}</div>
-            <div className="text-sm text-gray-500">Transactions</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-gray-900">${totalSpent.toFixed(0)}</div>
-            <div className="text-sm text-gray-500">Total Spent</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-emerald-600">${totalRewards.toFixed(2)}</div>
-            <div className="text-sm text-gray-500">Rewards Earned</div>
-          </CardContent>
-        </Card>
-      </div>
+      <TransactionSummary 
+        transactionCount={filteredTransactions.length}
+        totalSpent={totalSpent}
+        totalRewards={totalRewards}
+      />
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Search transactions..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-48">
-                <Filter className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map(category => (
-                  <SelectItem key={category.name} value={category.name}>
-                    {category.icon} {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full md:w-32">
-                <ArrowUpDown className="w-4 h-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="date">Date</SelectItem>
-                <SelectItem value="amount">Amount</SelectItem>
-                <SelectItem value="rewards">Rewards</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+      <TransactionFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        categories={categories}
+      />
 
-      {/* Transactions List */}
       <div className="space-y-3">
-        {filteredTransactions.map((transaction) => {
-          const categoryInfo = getCategoryInfo(transaction.category);
-          return (
-            <Card key={transaction.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-xl">
-                      {categoryInfo.icon}
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">{transaction.merchant}</div>
-                      <div className="text-sm text-gray-500 flex items-center space-x-2">
-                        <span>{transaction.date}</span>
-                        <Badge className={`text-xs ${categoryInfo.color}`}>
-                          {transaction.category}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-gray-900">${transaction.amount.toFixed(2)}</div>
-                    <div className="text-sm text-emerald-600 flex items-center">
-                      <TrendingUp className="w-3 h-3 mr-1" />
-                      +${transaction.rewards} rewards
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        {filteredTransactions.map((transaction) => (
+          <TransactionCard
+            key={transaction.id}
+            transaction={transaction}
+            categoryInfo={getCategoryInfo(transaction.category)}
+          />
+        ))}
       </div>
 
       {filteredTransactions.length === 0 && (
