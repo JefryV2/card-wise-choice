@@ -11,7 +11,7 @@ import {
   IoDownloadOutline,
   IoCardOutline,
   IoPieChartOutline,
-  IoTargetOutline,
+  IoFlagOutline,
   IoScanOutline,
   IoSettingsOutline,
   IoStatsChartOutline,
@@ -261,7 +261,7 @@ const Index = () => {
                 >
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-yellow-500 rounded-lg flex items-center justify-center mr-3">
-                      <IoTargetOutline className="w-5 h-5 text-white" />
+                      <IoFlagOutline className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-left">
                       <div className="font-medium text-gray-900">💰 Budget Tracking</div>
