@@ -1,7 +1,23 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, BarChart3, FileText, DollarSign, Download, TrendingUp, PieChart, Wallet, Database, Activity, Target, Scan, SettingsIcon as Settings, Home, Plus } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { 
+  IoWalletOutline, 
+  IoTrendingUpOutline, 
+  IoHomeOutline,
+  IoDocumentTextOutline,
+  IoCloudUploadOutline,
+  IoDownloadOutline,
+  IoCardOutline,
+  IoPieChartOutline,
+  IoTargetOutline,
+  IoScanOutline,
+  IoSettingsOutline,
+  IoStatsChartOutline,
+  IoAddOutline,
+  IoGiftOutline
+} from 'react-icons/io5';
 import { CreditCardManager } from "@/components/CreditCardManager";
 import { QuickRecommendation } from "@/components/QuickRecommendation";
 import { RewardsDashboard } from "@/components/RewardsDashboard";
@@ -32,12 +48,12 @@ const Index = () => {
       <header className="bg-white/80 backdrop-blur-sm px-4 py-4 flex items-center justify-between border-b border-gray-100 sticky top-0 z-50 shadow-sm">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-gradient-to-br from-emerald-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-200">
-            <Wallet className="w-4 h-4 text-white" />
+            <IoWalletOutline className="w-4 h-4 text-white" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-gray-900">CardWise</h1>
             <div className="text-xs text-gray-500 flex items-center">
-              <TrendingUp className="w-3 h-3 mr-1" />
+              <IoTrendingUpOutline className="w-3 h-3 mr-1" />
               Smart spending companion
             </div>
           </div>
@@ -49,7 +65,7 @@ const Index = () => {
           className="w-10 h-10 p-0 hover:bg-gray-100 rounded-full transition-all duration-200"
           onClick={() => setActiveTab('settings')}
         >
-          <Settings className="w-4 h-4 text-gray-600" />
+          <IoSettingsOutline className="w-4 h-4 text-gray-600" />
         </Button>
       </header>
 
@@ -60,7 +76,7 @@ const Index = () => {
             {/* Welcome Section */}
             <div className="text-center py-6">
               <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <Activity className="w-8 h-8 text-white" />
+                <IoStatsChartOutline className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to CardWise! 👋</h2>
               <p className="text-gray-600">Your smart companion for maximizing credit card rewards</p>
@@ -116,7 +132,7 @@ const Index = () => {
                           onClick={() => setActiveTab('cards')}
                           className="bg-white text-emerald-700 hover:bg-emerald-50 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
                         >
-                          <Plus className="w-4 h-4" />
+                          <IoAddOutline className="w-4 h-4" />
                         </Button>
                       </div>
                     </CardContent>
@@ -130,7 +146,7 @@ const Index = () => {
                     >
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center mr-3">
-                          <Scan className="w-5 h-5 text-white" />
+                          <IoScanOutline className="w-5 h-5 text-white" />
                         </div>
                         <div className="text-left">
                           <div className="font-medium text-gray-900">✨ Scan Card with AI</div>
@@ -147,7 +163,7 @@ const Index = () => {
                     >
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-500 rounded-lg flex items-center justify-center mr-3">
-                          <Database className="w-5 h-5 text-white" />
+                          <IoCloudUploadOutline className="w-5 h-5 text-white" />
                         </div>
                         <div className="text-left">
                           <div className="font-medium text-gray-900">📤 Upload Bank Records</div>
@@ -189,7 +205,7 @@ const Index = () => {
                     >
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center mr-3">
-                          <FileText className="w-5 h-5 text-white" />
+                          <IoDocumentTextOutline className="w-5 h-5 text-white" />
                         </div>
                         <div className="text-left">
                           <div className="font-medium text-gray-900">📝 Transaction History</div>
@@ -206,7 +222,7 @@ const Index = () => {
                     >
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
-                          <TrendingUp className="w-5 h-5 text-white" />
+                          <IoGiftOutline className="w-5 h-5 text-white" />
                         </div>
                         <div className="text-left">
                           <div className="font-medium text-gray-900">🏆 View Rewards</div>
@@ -228,7 +244,7 @@ const Index = () => {
                 >
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center mr-3">
-                      <PieChart className="w-5 h-5 text-white" />
+                      <IoPieChartOutline className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-left">
                       <div className="font-medium text-gray-900">📊 Spending Analytics</div>
@@ -245,7 +261,7 @@ const Index = () => {
                 >
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-yellow-500 rounded-lg flex items-center justify-center mr-3">
-                      <Target className="w-5 h-5 text-white" />
+                      <IoTargetOutline className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-left">
                       <div className="font-medium text-gray-900">💰 Budget Tracking</div>
@@ -262,7 +278,7 @@ const Index = () => {
                 >
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-lg flex items-center justify-center mr-3">
-                      <Download className="w-5 h-5 text-white" />
+                      <IoDownloadOutline className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-left">
                       <div className="font-medium text-gray-900">📊 Export Data</div>
@@ -279,7 +295,7 @@ const Index = () => {
               <Card className="border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-sm">
                 <CardContent className="p-6 text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Wallet className="w-8 h-8 text-white" />
+                    <IoWalletOutline className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-1">🚀 Ready to Get Started?</h3>
                   <p className="text-gray-600 text-sm mb-4">Add your credit cards to unlock personalized recommendations and reward tracking</p>
@@ -471,7 +487,7 @@ const Index = () => {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <Home className="w-5 h-5" />
+            <IoHomeOutline className="w-5 h-5" />
             <span className="text-xs font-medium">Home</span>
           </button>
 
@@ -483,7 +499,7 @@ const Index = () => {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <FileText className="w-5 h-5" />
+            <IoDocumentTextOutline className="w-5 h-5" />
             <span className="text-xs font-medium">History</span>
           </button>
 
@@ -495,7 +511,7 @@ const Index = () => {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <Database className="w-5 h-5" />
+            <IoCloudUploadOutline className="w-5 h-5" />
             <span className="text-xs font-medium">Upload</span>
           </button>
 
@@ -507,7 +523,7 @@ const Index = () => {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <Download className="w-5 h-5" />
+            <IoDownloadOutline className="w-5 h-5" />
             <span className="text-xs font-medium">Export</span>
           </button>
 
@@ -519,7 +535,7 @@ const Index = () => {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <Wallet className="w-5 h-5" />
+            <IoCardOutline className="w-5 h-5" />
             <span className="text-xs font-medium">Cards</span>
           </button>
         </div>
