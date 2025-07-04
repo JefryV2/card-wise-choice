@@ -33,6 +33,7 @@ import { DataExport } from "@/components/DataExport";
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [userCards, setUserCards] = useState([]);
+  const [uploadedTransactions, setUploadedTransactions] = useState([]);
 
   const addCard = (card: any) => {
     setUserCards([...userCards, { ...card, id: Date.now() }]);
@@ -42,17 +43,21 @@ const Index = () => {
     setUserCards(userCards.filter((card: any) => card.id !== cardId));
   };
 
+  const handleTransactionsImported = (transactions: any[]) => {
+    setUploadedTransactions(transactions);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm px-4 py-4 flex items-center justify-between border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+      <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm px-4 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 shadow-sm">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-emerald-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-200">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-200">
             <IoWalletOutline className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">CardWise</h1>
-            <div className="text-xs text-gray-500 flex items-center">
+            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">CardWise</h1>
+            <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center">
               <IoTrendingUpOutline className="w-3 h-3 mr-1" />
               Smart spending companion
             </div>
@@ -62,10 +67,10 @@ const Index = () => {
         <Button 
           variant="ghost" 
           size="sm" 
-          className="w-10 h-10 p-0 hover:bg-gray-100 rounded-full transition-all duration-200"
+          className="w-10 h-10 p-0 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all duration-200"
           onClick={() => setActiveTab('settings')}
         >
-          <IoSettingsOutline className="w-4 h-4 text-gray-600" />
+          <IoSettingsOutline className="w-4 h-4 text-slate-600 dark:text-slate-400" />
         </Button>
       </header>
 
@@ -75,62 +80,62 @@ const Index = () => {
           <div className="p-4 space-y-6 animate-fade-in">
             {/* Welcome Section */}
             <div className="text-center py-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <IoStatsChartOutline className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to CardWise! 👋</h2>
-              <p className="text-gray-600">Your smart companion for maximizing credit card rewards</p>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Welcome to CardWise! 👋</h2>
+              <p className="text-slate-600 dark:text-slate-400">Your smart companion for maximizing credit card rewards</p>
             </div>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-3 gap-3">
-              <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
+              <Card className="border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-gray-900">{userCards.length}</div>
-                  <div className="text-xs text-gray-500">Cards</div>
-                  {userCards.length > 0 && <div className="w-2 h-2 bg-green-400 rounded-full mx-auto mt-1"></div>}
+                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{userCards.length}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">Cards</div>
+                  {userCards.length > 0 && <div className="w-2 h-2 bg-blue-400 rounded-full mx-auto mt-1"></div>}
                 </CardContent>
               </Card>
               
-              <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
+              <Card className="border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-emerald-600">$0</div>
-                  <div className="text-xs text-gray-500">Rewards</div>
-                  <div className="text-xs text-gray-400">Get started</div>
+                  <div className="text-2xl font-bold text-blue-600">$0</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">Rewards</div>
+                  <div className="text-xs text-slate-400">Get started</div>
                 </CardContent>
               </Card>
               
-              <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
+              <Card className="border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-600">0</div>
-                  <div className="text-xs text-gray-500">Transactions</div>
-                  <div className="text-xs text-gray-400">Coming soon</div>
+                  <div className="text-2xl font-bold text-indigo-600">{uploadedTransactions.length}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">Transactions</div>
+                  <div className="text-xs text-slate-400">{uploadedTransactions.length > 0 ? 'Ready to view' : 'Upload bank records'}</div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Primary Actions */}
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-gray-900 flex items-center">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center">
                 Let's get you started! 
-                <Sparkles className="w-4 h-4 ml-2 text-yellow-500" />
+                <Sparkles className="w-4 h-4 ml-2 text-blue-500" />
               </h3>
               
               {/* Get Started Flow */}
               {userCards.length === 0 ? (
                 <>
-                  <Card className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
+                  <Card className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
                         <div>
                           <h3 className="text-xl font-bold mb-1 flex items-center">
                             🚀 Add Your First Card
                           </h3>
-                          <p className="text-emerald-100 text-sm">Start by adding your credit cards to unlock all features</p>
+                          <p className="text-blue-100 text-sm">Start by adding your credit cards to unlock all features</p>
                         </div>
                         <Button 
                           onClick={() => setActiveTab('cards')}
-                          className="bg-white text-emerald-700 hover:bg-emerald-50 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                          className="bg-white text-blue-700 hover:bg-blue-50 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
                         >
                           <IoAddOutline className="w-4 h-4" />
                         </Button>
@@ -177,18 +182,18 @@ const Index = () => {
               ) : (
                 <>
                   {/* Get Recommendation - Primary CTA */}
-                  <Card className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
+                  <Card className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
                         <div>
                           <h3 className="text-xl font-bold mb-1 flex items-center">
                             🎯 Get Card Recommendation
                           </h3>
-                          <p className="text-emerald-100 text-sm">Find the perfect card for your next purchase</p>
+                          <p className="text-blue-100 text-sm">Find the perfect card for your next purchase</p>
                         </div>
                         <Button 
                           onClick={() => setActiveTab('recommend')}
-                          className="bg-white text-emerald-700 hover:bg-emerald-50 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                          className="bg-white text-blue-700 hover:bg-blue-50 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
                         >
                           <ArrowRight className="w-4 h-4" />
                         </Button>
@@ -326,7 +331,7 @@ const Index = () => {
               <Button
                 variant="ghost"
                 onClick={() => setActiveTab('home')}
-                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+                className="mb-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 ← Back to Home
               </Button>
@@ -341,12 +346,12 @@ const Index = () => {
               <Button
                 variant="ghost"
                 onClick={() => setActiveTab('home')}
-                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+                className="mb-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 ← Back to Home
               </Button>
             </div>
-            <BankRecordUpload />
+            <BankRecordUpload onTransactionsImported={handleTransactionsImported} />
           </div>
         )}
 
@@ -356,7 +361,7 @@ const Index = () => {
               <Button
                 variant="ghost"
                 onClick={() => setActiveTab('home')}
-                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+                className="mb-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 ← Back to Home
               </Button>
@@ -371,12 +376,12 @@ const Index = () => {
               <Button
                 variant="ghost"
                 onClick={() => setActiveTab('home')}
-                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+                className="mb-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 ← Back to Home
               </Button>
             </div>
-            <TransactionHistory />
+            <TransactionHistory uploadedTransactions={uploadedTransactions} onNavigateToUpload={() => setActiveTab('upload')} />
           </div>
         )}
 
@@ -386,7 +391,7 @@ const Index = () => {
               <Button
                 variant="ghost"
                 onClick={() => setActiveTab('home')}
-                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+                className="mb-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 ← Back to Home
               </Button>
@@ -401,7 +406,7 @@ const Index = () => {
               <Button
                 variant="ghost"
                 onClick={() => setActiveTab('home')}
-                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+                className="mb-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 ← Back to Home
               </Button>
@@ -416,7 +421,7 @@ const Index = () => {
               <Button
                 variant="ghost"
                 onClick={() => setActiveTab('home')}
-                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+                className="mb-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 ← Back to Home
               </Button>
@@ -436,7 +441,7 @@ const Index = () => {
               <Button
                 variant="ghost"
                 onClick={() => setActiveTab('home')}
-                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+                className="mb-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 ← Back to Home
               </Button>
@@ -451,7 +456,7 @@ const Index = () => {
               <Button
                 variant="ghost"
                 onClick={() => setActiveTab('home')}
-                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+                className="mb-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 ← Back to Home
               </Button>
@@ -466,7 +471,7 @@ const Index = () => {
               <Button
                 variant="ghost"
                 onClick={() => setActiveTab('home')}
-                className="mb-2 hover:bg-gray-100 transition-colors duration-200"
+                className="mb-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 ← Back to Home
               </Button>
@@ -477,14 +482,14 @@ const Index = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-100 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-lg">
         <div className="flex items-center justify-around py-2">
           <button
             onClick={() => setActiveTab('home')}
             className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
               activeTab === 'home' 
-                ? 'bg-emerald-100 text-emerald-700 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 shadow-sm' 
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
             }`}
           >
             <IoHomeOutline className="w-5 h-5" />
@@ -495,8 +500,8 @@ const Index = () => {
             onClick={() => setActiveTab('transactions')}
             className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
               activeTab === 'transactions' 
-                ? 'bg-blue-100 text-blue-700 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 shadow-sm' 
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
             }`}
           >
             <IoDocumentTextOutline className="w-5 h-5" />
@@ -507,8 +512,8 @@ const Index = () => {
             onClick={() => setActiveTab('upload')}
             className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
               activeTab === 'upload' 
-                ? 'bg-purple-100 text-purple-700 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 shadow-sm' 
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
             }`}
           >
             <IoCloudUploadOutline className="w-5 h-5" />
@@ -519,8 +524,8 @@ const Index = () => {
             onClick={() => setActiveTab('export')}
             className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
               activeTab === 'export' 
-                ? 'bg-teal-100 text-teal-700 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 shadow-sm' 
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
             }`}
           >
             <IoDownloadOutline className="w-5 h-5" />
@@ -531,8 +536,8 @@ const Index = () => {
             onClick={() => setActiveTab('cards')}
             className={`flex flex-col items-center space-y-1 py-2 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 ${
               activeTab === 'cards' 
-                ? 'bg-gray-100 text-gray-700 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 shadow-sm' 
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
             }`}
           >
             <IoCardOutline className="w-5 h-5" />
@@ -540,7 +545,7 @@ const Index = () => {
           </button>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 
