@@ -3,8 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Professional color scheme using slate and blue */
-
+/* iPhone-first professional color scheme */
 @layer base {
   :root {
     --background: 248 250 252; /* slate-50 */
@@ -35,7 +34,7 @@
     --input: 226 232 240; /* slate-200 */
     --ring: 59 130 246; /* blue-500 */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Increased for iOS feel */
 
     --sidebar-background: 255 255 255;
     --sidebar-foreground: 15 23 42;
@@ -94,38 +93,89 @@
 
   body {
     @apply bg-background text-foreground;
-    /* iOS specific optimizations */
+    /* iOS-specific optimizations */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Prevent scroll bounce on iOS */
-    overscroll-behavior: none;
-    /* Safe area handling for iOS */
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    /* Enhanced iOS behavior */
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    /* iPhone safe area handling */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    /* Prevent text selection on iOS */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Better touch handling */
+    touch-action: manipulation;
   }
 
-  /* Mobile-specific styling */
-  @media (max-width: 768px) {
-    body {
-      /* Better touch targets */
-      touch-action: manipulation;
+  /* Allow text selection only where needed */
+  input, textarea, [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* iOS-specific improvements */
+  @supports (-webkit-touch-callout: none) {
+    /* iPhone-specific styles */
+    .ios-safe-area {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    /* Prevent unwanted zoom on input focus */
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    textarea {
+      font-size: 16px;
+      border-radius: 0.75rem;
+    }
+
+    /* iOS button styling */
+    button {
+      -webkit-appearance: none;
+      -webkit-tap-highlight-color: transparent;
     }
   }
 
-  /* Professional gradients */
-  .gradient-primary {
-    @apply bg-gradient-to-r from-blue-600 to-indigo-600;
+  /* iPhone-first touch targets (Apple HIG: 44px minimum) */
+  button, 
+  [role="button"],
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .gradient-secondary {
-    @apply bg-gradient-to-r from-slate-600 to-slate-700;
+  /* Enhanced iOS scroll behavior */
+  .scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }
 
-/* Custom animations for personality */
-@keyframes fade-in {
+/* iPhone-optimized animations */
+@keyframes ios-fade-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ios-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
   }
   to {
     opacity: 1;
@@ -133,16 +183,107 @@
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.4s ease-out;
+.animate-ios-fade-in {
+  animation: ios-fade-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Smooth scrolling */
+.animate-ios-slide-up {
+  animation: ios-slide-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
+}
+
+/* iPhone-style card components */
+.ios-card {
+  @apply bg-white dark:bg-slate-900 border-0 shadow-sm rounded-xl;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.ios-card-elevated {
+  @apply ios-card shadow-lg;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* iPhone-style buttons */
+.ios-button {
+  @apply px-6 py-3 rounded-xl font-medium transition-all duration-200 active:scale-95;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.ios-button-primary {
+  @apply ios-button bg-blue-500 hover:bg-blue-600 text-white shadow-md;
+}
+
+.ios-button-secondary {
+  @apply ios-button bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100;
+}
+
+/* iPhone navigation styles */
+.ios-nav-item {
+  @apply flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-200 active:scale-95;
+  min-height: 60px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-nav-item.active {
+  @apply bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400;
+}
+
+/* iPhone header styling */
+.ios-header {
+  @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50;
+  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(40px);
+}
+
+/* iPhone-style input fields */
+.ios-input {
+  @apply px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200;
+  font-size: 16px; /* Prevents zoom on iOS */
+}
+
+/* iPhone-style sections */
+.ios-section {
+  @apply space-y-3 px-4 py-2;
+}
+
+.ios-section-header {
+  @apply text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide px-1;
+}
+
+/* iPhone-optimized grid layouts */
+.ios-grid-2 {
+  @apply grid grid-cols-2 gap-3;
+}
+
+.ios-grid-3 {
+  @apply grid grid-cols-3 gap-3;
+}
+
+/* iPhone status indicators */
+.ios-badge {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+}
+
+/* iPhone-style list items */
+.ios-list-item {
+  @apply flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 active:scale-[0.98];
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* iPhone bottom sheet styling */
+.ios-bottom-sheet {
+  @apply fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 rounded-t-3xl shadow-2xl;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Smooth scrolling for iPhone */
 html {
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Enhanced focus states */
+/* Enhanced focus states for accessibility */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
@@ -150,47 +291,9 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
-/* iOS specific improvements */
-@supports (-webkit-touch-callout: none) {
-  /* iOS Safari specific styles */
-  .ios-safe-area {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
+/* Dark mode improvements */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
   }
-  
-  /* Prevent unwanted zoom on input focus */
-  input[type="text"],
-  input[type="number"],
-  select,
-  textarea {
-    font-size: 16px;
-  }
-}
-
-/* Mobile-optimized touch targets */
-@media (max-width: 768px) {
-  button, 
-  [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
-  }
-}
-
-/* Dark mode toggle support */
-.dark-mode-toggle {
-  transition: all 0.3s ease;
-}
-
-/* Professional card styles */
-.card-professional {
-  @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200;
-}
-
-/* Button hover effects */
-.btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white transform hover:scale-105 transition-all duration-200;
-}
-
-.btn-secondary {
-  @apply bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 transform hover:scale-105 transition-all duration-200;
 }

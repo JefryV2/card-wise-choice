@@ -92,24 +92,24 @@ export const TransactionHistory = ({ uploadedTransactions = [], onNavigateToUplo
       )}
 
       {transactions.length === 0 ? (
-        <Card className="border border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
+        <Card className="ios-card border border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
           <CardContent className="p-8 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <Receipt className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">No Transactions Yet</h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">Start by uploading your bank records or making your first purchase with a registered card to see your transaction history here.</p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <p className="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">Start by uploading your bank records or making your first purchase with a registered card to see your transaction history here.</p>
+            <div className="flex flex-col gap-3 justify-center">
               <Button 
                 onClick={onNavigateToUpload}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                className="ios-button-primary w-full"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Upload Bank Records
               </Button>
               <Button 
                 variant="outline" 
-                className="hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transform hover:scale-105 transition-all duration-200"
+                className="ios-button-secondary w-full"
                 onClick={() => window.open('https://docs.lovable.dev', '_blank')}
               >
                 Learn More
@@ -130,7 +130,7 @@ export const TransactionHistory = ({ uploadedTransactions = [], onNavigateToUplo
       )}
 
       {transactions.length > 0 && filteredTransactions.length === 0 && (
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+        <Card className="ios-card">
           <CardContent className="p-8 text-center">
             <div className="text-slate-400 mb-4">
               <Receipt className="w-12 h-12 mx-auto" />
