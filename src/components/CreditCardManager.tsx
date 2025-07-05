@@ -1,341 +1,230 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, CreditCard, Trash2, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const CARD_TYPES = [
-  { value: 'cashback', label: 'Cashback' },
-  { value: 'travel', label: 'Travel Rewards' },
-  { value: 'points', label: 'Points/Miles' },
-  { value: 'balance-transfer', label: 'Balance Transfer' },
-  { value: 'business', label: 'Business' }
-];
+interface CreditCardManagerProps {
+  userCards: any[];
+  onAddCard: (card: any) => void;
+  onRemoveCard: (cardId: number) => void;
+}
 
-const REWARD_CATEGORIES = [
-  { value: 'dining', label: 'Dining' },
-  { value: 'gas', label: 'Gas Stations' },
-  { value: 'groceries', label: 'Groceries' },
-  { value: 'travel', label: 'Travel' },
-  { value: 'online', label: 'Online Shopping' },
-  { value: 'streaming', label: 'Streaming Services' },
-  { value: 'general', label: 'General Purchases' }
-];
-
-export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }: any) => {
+export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }: CreditCardManagerProps) => {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [newCard, setNewCard] = useState({
     name: '',
     bank: '',
-    type: '',
-    annualFee: '',
     rewardRate: '',
-    bonusCategory: '',
-    signupBonus: '',
-    notes: ''
+    category: '',
+    annualFee: ''
   });
   const { toast } = useToast();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!newCard.name || !newCard.bank || !newCard.type) {
+  const handleAddCard = () => {
+    if (!newCard.name || !newCard.bank || !newCard.rewardRate) {
       toast({
         title: "Missing Information",
-        description: "Please fill in the required fields (name, bank, and type).",
+        description: "Please fill in all required fields.",
         variant: "destructive"
       });
       return;
     }
 
-    onAddCard(newCard);
-    setNewCard({
-      name: '',
-      bank: '',
-      type: '',
-      annualFee: '',
-      rewardRate: '',
-      bonusCategory: '',
-      signupBonus: '',
-      notes: ''
-    });
+    const card = {
+      ...newCard,
+      rewardRate: parseFloat(newCard.rewardRate),
+      annualFee: newCard.annualFee ? parseFloat(newCard.annualFee) : 0,
+      id: Date.now()
+    };
+
+    onAddCard(card);
+    setNewCard({ name: '', bank: '', rewardRate: '', category: '', annualFee: '' });
     setShowAddForm(false);
     
     toast({
-      title: "Card Added Successfully",
-      description: `${newCard.name} has been added to your portfolio.`
+      title: "Card Added",
+      description: `${card.name} has been added to your wallet.`,
     });
   };
 
-  const getCardVisual = (card: any) => {
-    // If card has an image (from pre-programmed cards)
-    if (card.image) {
-      return (
-        <div className="w-full h-32 rounded-lg overflow-hidden shadow-lg mb-4">
-          <img 
-            src={card.image} 
-            alt={card.name}
-            className="w-full h-32 object-cover"
-          />
-        </div>
-      );
-    }
-    
-    // Default card visual for manually added cards
-    const getCardColor = (type: string) => {
-      switch (type) {
-        case 'travel': return 'from-blue-500 to-blue-700';
-        case 'cashback': return 'from-green-500 to-green-700';
-        case 'points': return 'from-purple-500 to-purple-700';
-        case 'balance-transfer': return 'from-orange-500 to-orange-700';
-        case 'business': return 'from-gray-500 to-gray-700';
-        default: return 'from-gray-400 to-gray-600';
-      }
-    };
-
-    return (
-      <div className={`w-full h-32 rounded-lg bg-gradient-to-r ${getCardColor(card.type)} flex items-center justify-center shadow-lg mb-4`}>
-        <div className="text-center text-white">
-          <CreditCard className="w-12 h-12 mx-auto mb-2 opacity-80" />
-          <div className="text-xs font-medium opacity-75">{card.bank}</div>
-        </div>
-      </div>
-    );
+  const handleRemoveCard = (cardId: number, cardName: string) => {
+    onRemoveCard(cardId);
+    toast({
+      title: "Card Removed",
+      description: `${cardName} has been removed from your wallet.`,
+    });
   };
 
   return (
-    <div className="space-y-4 md:space-y-6">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-3 md:space-y-0">
-        <div>
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900">Your Credit Cards</h2>
-          <p className="text-sm md:text-base text-gray-600">Manage your credit card portfolio</p>
-        </div>
-        <Button 
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 w-full md:w-auto"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Credit Card
-        </Button>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900 mb-1">My Credit Cards</h2>
+        <p className="text-slate-600">Manage your credit card portfolio</p>
       </div>
 
+      {/* Add Card Button */}
+      {!showAddForm && (
+        <Button 
+          onClick={() => setShowAddForm(true)}
+          className="w-full h-14 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white rounded-3xl font-semibold shadow-lg transition-all duration-300 transform active:scale-95"
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          Add New Card
+        </Button>
+      )}
+
+      {/* Add Card Form */}
       {showAddForm && (
-        <Card className="border-2 border-blue-200">
-          <CardHeader>
-            <CardTitle className="flex items-center text-lg">
-              <CreditCard className="h-5 w-5 mr-2" />
-              Add New Credit Card
-            </CardTitle>
-            <CardDescription className="text-sm">
-              Enter your credit card details to start getting personalized recommendations
-            </CardDescription>
+        <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-bold text-slate-800">Add New Card</CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <Label htmlFor="name" className="text-sm">Card Name *</Label>
-                  <Input
-                    id="name"
-                    value={newCard.name}
-                    onChange={(e) => setNewCard({...newCard, name: e.target.value})}
-                    placeholder="e.g., Chase Sapphire Preferred"
-                    required
-                    className="mt-1"
-                  />
-                </div>
+          <CardContent className="space-y-4 pb-6">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="cardName" className="text-slate-700 font-medium">Card Name</Label>
+                <Input
+                  id="cardName"
+                  value={newCard.name}
+                  onChange={(e) => setNewCard({ ...newCard, name: e.target.value })}
+                  placeholder="e.g., Chase Sapphire Preferred"
+                  className="mt-2 h-12 rounded-2xl border-slate-200 bg-slate-50/50 focus:bg-white transition-colors"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="bank" className="text-slate-700 font-medium">Bank/Issuer</Label>
+                <Input
+                  id="bank"
+                  value={newCard.bank}
+                  onChange={(e) => setNewCard({ ...newCard, bank: e.target.value })}
+                  placeholder="e.g., Chase"
+                  className="mt-2 h-12 rounded-2xl border-slate-200 bg-slate-50/50 focus:bg-white transition-colors"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="bank">Bank/Issuer *</Label>
-                  <Input
-                    id="bank"
-                    value={newCard.bank}
-                    onChange={(e) => setNewCard({...newCard, bank: e.target.value})}
-                    placeholder="e.g., Chase, Capital One"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="type">Card Type *</Label>
-                  <Select onValueChange={(value) => setNewCard({...newCard, type: value})}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select card type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CARD_TYPES.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="annualFee">Annual Fee ($)</Label>
-                  <Input
-                    id="annualFee"
-                    type="number"
-                    value={newCard.annualFee}
-                    onChange={(e) => setNewCard({...newCard, annualFee: e.target.value})}
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="rewardRate">Base Reward Rate (%)</Label>
+                  <Label htmlFor="rewardRate" className="text-slate-700 font-medium">Reward Rate (%)</Label>
                   <Input
                     id="rewardRate"
                     type="number"
                     step="0.1"
                     value={newCard.rewardRate}
-                    onChange={(e) => setNewCard({...newCard, rewardRate: e.target.value})}
-                    placeholder="1.0"
+                    onChange={(e) => setNewCard({ ...newCard, rewardRate: e.target.value })}
+                    placeholder="2.0"
+                    className="mt-2 h-12 rounded-2xl border-slate-200 bg-slate-50/50 focus:bg-white transition-colors"
                   />
                 </div>
+
                 <div>
-                  <Label htmlFor="bonusCategory">Bonus Category</Label>
-                  <Select onValueChange={(value) => setNewCard({...newCard, bonusCategory: value})}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select bonus category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {REWARD_CATEGORIES.map((category) => (
-                        <SelectItem key={category.value} value={category.value}>
-                          {category.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="annualFee" className="text-slate-700 font-medium">Annual Fee ($)</Label>
+                  <Input
+                    id="annualFee"
+                    type="number"
+                    value={newCard.annualFee}
+                    onChange={(e) => setNewCard({ ...newCard, annualFee: e.target.value })}
+                    placeholder="95"
+                    className="mt-2 h-12 rounded-2xl border-slate-200 bg-slate-50/50 focus:bg-white transition-colors"
+                  />
                 </div>
               </div>
-              
-              <div>
-                <Label htmlFor="signupBonus">Sign-up Bonus</Label>
-                <Input
-                  id="signupBonus"
-                  value={newCard.signupBonus}
-                  onChange={(e) => setNewCard({...newCard, signupBonus: e.target.value})}
-                  placeholder="e.g., 60,000 points after $4,000 spend"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="notes">Additional Notes</Label>
-                <Input
-                  id="notes"
-                  value={newCard.notes}
-                  onChange={(e) => setNewCard({...newCard, notes: e.target.value})}
-                  placeholder="Any additional benefits or notes"
-                />
-              </div>
 
-              <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3">
-                <Button type="submit" className="bg-green-600 hover:bg-green-700 flex-1">
-                  Add Card
-                </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setShowAddForm(false)}
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
+              <div>
+                <Label htmlFor="category" className="text-slate-700 font-medium">Best Category</Label>
+                <Select value={newCard.category} onValueChange={(value) => setNewCard({ ...newCard, category: value })}>
+                  <SelectTrigger className="mt-2 h-12 rounded-2xl border-slate-200 bg-slate-50/50">
+                    <SelectValue placeholder="Select primary reward category" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-slate-200 bg-white shadow-xl">
+                    <SelectItem value="dining">🍽️ Dining</SelectItem>
+                    <SelectItem value="groceries">🛒 Groceries</SelectItem>
+                    <SelectItem value="gas">⛽ Gas</SelectItem>
+                    <SelectItem value="travel">✈️ Travel</SelectItem>
+                    <SelectItem value="cashback">💰 General Cashback</SelectItem>
+                    <SelectItem value="online">🛍️ Online Shopping</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </form>
+            </div>
+
+            <div className="flex space-x-3 pt-4">
+              <Button 
+                onClick={handleAddCard}
+                className="flex-1 h-12 bg-slate-700 hover:bg-slate-800 text-white rounded-2xl font-medium transition-all duration-200"
+              >
+                Add Card
+              </Button>
+              <Button 
+                onClick={() => setShowAddForm(false)}
+                variant="outline"
+                className="flex-1 h-12 border-slate-200 text-slate-700 rounded-2xl font-medium transition-all duration-200"
+              >
+                Cancel
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Mobile-optimized card display */}
-      <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:space-y-0">
-        {userCards.map((card: any) => (
-          <Card key={card.id} className="hover:shadow-lg transition-shadow overflow-hidden">
-            {/* Card Visual */}
-            {getCardVisual(card)}
-            
-            <CardHeader className="pb-3 pt-0">
-              <div className="flex justify-between items-start">
-                <div className="flex-1 min-w-0">
-                  <CardTitle className="text-base md:text-lg truncate">{card.name}</CardTitle>
-                  <CardDescription className="text-sm">{card.bank}</CardDescription>
+      {/* Existing Cards */}
+      {userCards.length > 0 ? (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-800">Your Cards ({userCards.length})</h3>
+          {userCards.map((card) => (
+            <Card key={card.id} className="bg-white/80 backdrop-blur-lg border-0 shadow-lg rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-8 bg-gradient-to-r from-slate-600 to-slate-800 rounded-xl flex items-center justify-center shadow-md">
+                      <CreditCard className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900">{card.name}</h4>
+                      <p className="text-sm text-slate-600">{card.bank}</p>
+                      {card.category && (
+                        <div className="flex items-center mt-1">
+                          <Badge variant="secondary" className="text-xs bg-slate-100 text-slate-700 rounded-xl">
+                            Best for: {card.category}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="text-right">
+                    <div className="flex items-center text-slate-900 font-bold">
+                      <Star className="w-4 h-4 text-amber-500 mr-1" />
+                      {card.rewardRate}%
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      {card.annualFee > 0 ? `$${card.annualFee}/year` : 'No annual fee'}
+                    </p>
+                    <Button
+                      onClick={() => handleRemoveCard(card.id, card.name)}
+                      variant="ghost"
+                      size="sm"
+                      className="mt-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all duration-200"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-1 ml-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setExpandedCard(expandedCard === card.id ? null : card.id)}
-                    className="md:hidden p-1"
-                  >
-                    {expandedCard === card.id ? 
-                      <ChevronUp className="h-4 w-4" /> : 
-                      <ChevronDown className="h-4 w-4" />
-                    }
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onRemoveCard(card.id)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            
-            <CardContent className={`space-y-3 ${expandedCard === card.id ? 'block' : 'hidden md:block'}`}>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary" className="text-xs">
-                  {CARD_TYPES.find((t: any) => t.value === card.type)?.label}
-                </Badge>
-                {card.bonusCategory && (
-                  <Badge variant="outline" className="text-xs">
-                    {REWARD_CATEGORIES.find((c: any) => c.value === card.bonusCategory)?.label}
-                  </Badge>
-                )}
-              </div>
-              
-              <div className="space-y-1 text-sm">
-                {card.rewardRate && (
-                  <p className="text-gray-600">Base Rate: {card.rewardRate}%</p>
-                )}
-                {card.annualFee && (
-                  <p className="text-gray-600">Annual Fee: ${card.annualFee}</p>
-                )}
-                {card.signupBonus && (
-                  <p className="text-green-600 font-medium text-xs">{card.signupBonus}</p>
-                )}
-              </div>
-              
-              {card.notes && (
-                <p className="text-xs text-gray-500 italic">{card.notes}</p>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {userCards.length === 0 && !showAddForm && (
-        <Card className="text-center py-12">
-          <CardContent>
-            <CreditCard className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No Credit Cards Added Yet
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Add your credit cards to start getting personalized recommendations and track your rewards.
-            </p>
-            <Button 
-              onClick={() => setShowAddForm(true)}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Your First Card
-            </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card className="bg-slate-50/50 border-slate-200 rounded-3xl">
+          <CardContent className="p-8 text-center">
+            <CreditCard className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-slate-800 mb-2">No Cards Added Yet</h3>
+            <p className="text-slate-600 mb-4">Add your first credit card to start getting personalized recommendations.</p>
           </CardContent>
         </Card>
       )}
