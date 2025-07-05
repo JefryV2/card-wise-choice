@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -108,7 +107,7 @@ export const BankRecordUpload = ({ onTransactionsImported }: BankRecordUploadPro
       </div>
 
       {/* Upload Section */}
-      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+      <Card className="ios-card bg-white/80 backdrop-blur-lg shadow-xl rounded-3xl border-0 overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center text-slate-900 dark:text-slate-100">
             <Upload className="w-5 h-5 mr-2" />
@@ -119,7 +118,7 @@ export const BankRecordUpload = ({ onTransactionsImported }: BankRecordUploadPro
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg p-6 text-center hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
+          <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl p-6 text-center hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
             <Upload className="w-8 h-8 text-slate-400 mx-auto mb-4" />
             <Label htmlFor="file-upload" className="cursor-pointer">
               <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
@@ -139,7 +138,7 @@ export const BankRecordUpload = ({ onTransactionsImported }: BankRecordUploadPro
           </div>
 
           {uploadedFile && (
-            <div className="flex items-center space-x-3 p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg">
+            <div className="flex items-center space-x-3 p-3 bg-blue-50 dark:bg-blue-950/50 rounded-2xl">
               <FileText className="w-5 h-5 text-blue-600" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{uploadedFile.name}</p>
@@ -161,7 +160,7 @@ export const BankRecordUpload = ({ onTransactionsImported }: BankRecordUploadPro
 
       {/* Preview Section */}
       {parsedTransactions.length > 0 && (
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+        <Card className="ios-card bg-white/80 backdrop-blur-lg shadow-xl rounded-3xl border-0 overflow-hidden">
           <CardHeader>
             <CardTitle className="text-slate-900 dark:text-slate-100">Transaction Preview</CardTitle>
             <CardDescription className="text-slate-600 dark:text-slate-400">
@@ -171,14 +170,14 @@ export const BankRecordUpload = ({ onTransactionsImported }: BankRecordUploadPro
           <CardContent>
             <div className="space-y-3 max-h-64 overflow-y-auto">
               {parsedTransactions.map((transaction, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                   <div>
                     <div className="font-medium text-slate-900 dark:text-slate-100">{transaction.merchant}</div>
                     <div className="text-sm text-slate-500 dark:text-slate-400">{transaction.date}</div>
                   </div>
                   <div className="text-right">
                     <div className="font-bold text-slate-900 dark:text-slate-100">${transaction.amount}</div>
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className="text-xs bg-slate-100 text-slate-700 rounded-xl">
                       {transaction.category}
                     </Badge>
                   </div>
@@ -186,7 +185,10 @@ export const BankRecordUpload = ({ onTransactionsImported }: BankRecordUploadPro
               ))}
             </div>
             <div className="pt-4 border-t border-slate-200 dark:border-slate-700 mt-4">
-              <Button onClick={importTransactions} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+              <Button 
+                onClick={importTransactions} 
+                className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-2xl font-medium shadow-lg transition-all duration-300 transform active:scale-95"
+              >
                 Import {parsedTransactions.length} Transactions
               </Button>
             </div>
@@ -195,7 +197,7 @@ export const BankRecordUpload = ({ onTransactionsImported }: BankRecordUploadPro
       )}
 
       {/* Supported Formats */}
-      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+      <Card className="ios-card bg-white/80 backdrop-blur-lg shadow-xl rounded-3xl border-0 overflow-hidden">
         <CardHeader>
           <CardTitle className="text-lg text-slate-900 dark:text-slate-100">Supported Bank Formats</CardTitle>
         </CardHeader>

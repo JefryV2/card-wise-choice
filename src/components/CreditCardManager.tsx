@@ -80,7 +80,7 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }: Credit
 
       {/* Add Card Form */}
       {showAddForm && (
-        <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-xl rounded-3xl overflow-hidden">
+        <Card className="ios-card bg-white/80 backdrop-blur-lg border-0 shadow-xl rounded-3xl overflow-hidden">
           <CardHeader className="pb-4">
             <CardTitle className="text-xl font-bold text-slate-800">Add New Card</CardTitle>
           </CardHeader>
@@ -142,12 +142,12 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }: Credit
                     <SelectValue placeholder="Select primary reward category" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-slate-200 bg-white shadow-xl">
-                    <SelectItem value="dining">🍽️ Dining</SelectItem>
-                    <SelectItem value="groceries">🛒 Groceries</SelectItem>
-                    <SelectItem value="gas">⛽ Gas</SelectItem>
-                    <SelectItem value="travel">✈️ Travel</SelectItem>
-                    <SelectItem value="cashback">💰 General Cashback</SelectItem>
-                    <SelectItem value="online">🛍️ Online Shopping</SelectItem>
+                    <SelectItem value="dining" className="rounded-xl">🍽️ Dining</SelectItem>
+                    <SelectItem value="groceries" className="rounded-xl">🛒 Groceries</SelectItem>
+                    <SelectItem value="gas" className="rounded-xl">⛽ Gas</SelectItem>
+                    <SelectItem value="travel" className="rounded-xl">✈️ Travel</SelectItem>
+                    <SelectItem value="cashback" className="rounded-xl">💰 General Cashback</SelectItem>
+                    <SelectItem value="online" className="rounded-xl">🛍️ Online Shopping</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -177,7 +177,7 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }: Credit
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-slate-800">Your Cards ({userCards.length})</h3>
           {userCards.map((card) => (
-            <Card key={card.id} className="bg-white/80 backdrop-blur-lg border-0 shadow-lg rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300">
+            <Card key={card.id} className="ios-card bg-white/80 backdrop-blur-lg border-0 shadow-lg rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
@@ -220,7 +220,7 @@ export const CreditCardManager = ({ userCards, onAddCard, onRemoveCard }: Credit
           ))}
         </div>
       ) : (
-        <Card className="bg-slate-50/50 border-slate-200 rounded-3xl">
+        <Card className="ios-card bg-slate-50/50 border-slate-200 rounded-3xl border-0 shadow-lg">
           <CardContent className="p-8 text-center">
             <CreditCard className="w-12 h-12 text-slate-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-slate-800 mb-2">No Cards Added Yet</h3>

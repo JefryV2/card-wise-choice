@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -127,7 +126,7 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
 
   if (showConfirmation && recommendation) {
     return (
-      <Card className="ios-card border-2 border-blue-200">
+      <Card className="ios-card border-2 border-blue-200 rounded-3xl bg-white/80 backdrop-blur-lg shadow-xl">
         <CardHeader>
           <CardTitle className="flex items-center text-slate-800">
             <CheckCircle className="h-5 w-5 mr-2 text-blue-600" />
@@ -138,7 +137,7 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="bg-slate-50 rounded-xl p-4">
+          <div className="bg-slate-50 rounded-2xl p-4">
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-slate-600">Merchant:</span>
@@ -162,14 +161,14 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
           <div className="flex space-x-3">
             <Button 
               onClick={() => handlePurchaseConfirmation(true)}
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 rounded-2xl h-12"
             >
               Yes, I Made This Purchase
             </Button>
             <Button 
               variant="outline" 
               onClick={() => handlePurchaseConfirmation(false)}
-              className="flex-1"
+              className="flex-1 rounded-2xl h-12"
             >
               Cancel
             </Button>
@@ -186,7 +185,7 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
         <p className="text-slate-600">Enter your purchase details to get a recommendation</p>
       </div>
 
-      <Card className="ios-card border border-slate-200">
+      <Card className="ios-card border-0 bg-white/80 backdrop-blur-lg shadow-xl rounded-3xl overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center text-slate-800">
             <CreditCard className="h-5 w-5 mr-2 text-blue-600" />
@@ -201,7 +200,7 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
               value={merchantName}
               onChange={(e) => setMerchantName(e.target.value)}
               placeholder="e.g., Starbucks, Target..."
-              className="mt-1"
+              className="mt-1 h-12 rounded-2xl border-slate-200 bg-slate-50/50 focus:bg-white transition-colors"
             />
           </div>
 
@@ -215,19 +214,19 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
                 value={spendingAmount}
                 onChange={(e) => setSpendingAmount(e.target.value)}
                 placeholder="100.00"
-                className="mt-1"
+                className="mt-1 h-12 rounded-2xl border-slate-200 bg-slate-50/50 focus:bg-white transition-colors"
               />
             </div>
             
             <div>
               <Label htmlFor="category">Category</Label>
               <Select value={spendingCategory} onValueChange={setSpendingCategory}>
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="mt-1 h-12 rounded-2xl border-slate-200 bg-slate-50/50">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-2xl border-slate-200 bg-white shadow-xl">
                   {SPENDING_CATEGORIES.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
+                    <SelectItem key={category.value} value={category.value} className="rounded-xl">
                       <span className="flex items-center">
                         <span className="mr-2">{category.icon}</span>
                         {category.label}
@@ -241,7 +240,7 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
           
           <Button 
             onClick={getRecommendation}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full bg-blue-600 hover:bg-blue-700 h-12 rounded-2xl"
           >
             <TrendingUp className="h-4 w-4 mr-2" />
             Get Recommendation
@@ -250,7 +249,7 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
       </Card>
 
       {recommendation && (
-        <Card className="ios-card border-2 border-green-200 bg-green-50">
+        <Card className="ios-card border-2 border-green-200 bg-gradient-to-br from-green-50/80 to-emerald-50/80 backdrop-blur-lg shadow-xl rounded-3xl overflow-hidden">
           <CardHeader>
             <CardTitle className="flex items-center text-green-800">
               <CreditCard className="h-5 w-5 mr-2" />
@@ -258,13 +257,13 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="bg-white rounded-xl p-4">
+            <div className="bg-white/90 rounded-2xl p-4 shadow-sm">
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <h3 className="text-xl font-bold text-slate-800">{recommendation.card.name}</h3>
                   <p className="text-slate-600">{recommendation.card.bank}</p>
                 </div>
-                <Badge className="bg-green-100 text-green-800">Best Choice</Badge>
+                <Badge className="bg-green-100 text-green-800 rounded-xl">Best Choice</Badge>
               </div>
               
               <div className="space-y-3">
@@ -275,7 +274,7 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
                   </span>
                 </div>
                 
-                <div className="bg-blue-50 rounded-xl p-3">
+                <div className="bg-blue-50 rounded-2xl p-3">
                   <p className="text-sm text-blue-800">{recommendation.reasoning}</p>
                 </div>
               </div>
@@ -283,7 +282,7 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
 
             <Button 
               onClick={() => setShowConfirmation(true)}
-              className="w-full bg-green-600 hover:bg-green-700"
+              className="w-full bg-green-600 hover:bg-green-700 h-12 rounded-2xl"
             >
               <CheckCircle className="h-4 w-4 mr-2" />
               Continue to Purchase Confirmation
@@ -293,7 +292,7 @@ export const ManualRecommendation = ({ userCards, onPurchaseConfirmed }: ManualR
       )}
 
       {userCards.length === 0 && (
-        <Card className="ios-card text-center py-12 border-2 border-dashed border-slate-300">
+        <Card className="ios-card text-center py-12 border-2 border-dashed border-slate-300 rounded-3xl bg-white/80 backdrop-blur-lg shadow-xl">
           <CardContent>
             <CreditCard className="h-16 w-16 text-slate-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-slate-800 mb-2">
