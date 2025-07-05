@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -152,23 +153,23 @@ export const CardDropdown = ({ onAddCard, userCards }: { onAddCard: (card: any) 
   return (
     <div className="space-y-6">
       {/* Pre-programmed Cards Dropdown */}
-      <Card className="border-0 bg-white">
+      <Card className="border-0 bg-white/80 backdrop-blur-lg shadow-xl rounded-3xl overflow-hidden">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center">
-            <CreditCard className="w-5 h-5 mr-2 text-gray-600" />
+          <CardTitle className="text-lg flex items-center text-slate-800">
+            <CreditCard className="w-5 h-5 mr-2 text-slate-600" />
             Add Popular Card
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Select onValueChange={setSelectedCardId}>
-            <SelectTrigger>
+            <SelectTrigger className="h-12 rounded-2xl border-slate-200 bg-slate-50/50 focus:bg-white transition-colors">
               <SelectValue placeholder="Choose from popular cards" />
             </SelectTrigger>
-            <SelectContent className="bg-white border shadow-lg z-50">
+            <SelectContent className="bg-white border shadow-xl z-50 rounded-2xl border-slate-200">
               {PRE_PROGRAMMED_CARDS.map((card) => (
-                <SelectItem key={card.id} value={card.id}>
+                <SelectItem key={card.id} value={card.id} className="rounded-xl">
                   <div className="flex items-center space-x-3 w-full">
-                    <div className="w-12 h-8 rounded-md overflow-hidden shadow-sm">
+                    <div className="w-12 h-8 rounded-xl overflow-hidden shadow-sm">
                       <img 
                         src={card.image} 
                         alt={card.name}
@@ -186,13 +187,13 @@ export const CardDropdown = ({ onAddCard, userCards }: { onAddCard: (card: any) 
           </Select>
 
           {selectedCardId && (
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-slate-50 rounded-2xl p-4">
               {(() => {
                 const card = PRE_PROGRAMMED_CARDS.find(c => c.id === selectedCardId);
                 return card ? (
                   <div className="space-y-4">
                     <div className="flex items-center space-x-4">
-                      <div className="w-24 h-16 rounded-lg overflow-hidden shadow-lg">
+                      <div className="w-24 h-16 rounded-2xl overflow-hidden shadow-lg">
                         <img 
                           src={card.image} 
                           alt={card.name}
@@ -201,7 +202,7 @@ export const CardDropdown = ({ onAddCard, userCards }: { onAddCard: (card: any) 
                       </div>
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900">{card.name}</h4>
-                        <Badge variant="secondary" className="bg-gray-100 text-gray-600 mt-1">
+                        <Badge variant="secondary" className="bg-gray-100 text-gray-600 mt-1 rounded-xl">
                           {card.bank}
                         </Badge>
                       </div>
@@ -243,7 +244,7 @@ export const CardDropdown = ({ onAddCard, userCards }: { onAddCard: (card: any) 
           <Button 
             onClick={handleAddPreProgrammedCard}
             disabled={!selectedCardId}
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white"
+            className="w-full h-12 bg-slate-700 hover:bg-slate-800 text-white rounded-2xl font-medium transition-all duration-300 transform active:scale-95"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Card to Portfolio
@@ -252,21 +253,21 @@ export const CardDropdown = ({ onAddCard, userCards }: { onAddCard: (card: any) 
       </Card>
 
       {/* Next Card Recommendation */}
-      <Card className="border-0 bg-gradient-to-r from-blue-50 to-gray-50">
+      <Card className="border-0 bg-gradient-to-br from-blue-50/80 to-slate-50/80 backdrop-blur-lg shadow-xl rounded-3xl overflow-hidden">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center">
+          <CardTitle className="text-lg flex items-center text-slate-800">
             <Star className="w-5 h-5 mr-2 text-blue-600" />
             Recommended Next Card
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="bg-white rounded-lg p-4 shadow-sm">
+          <div className="bg-white/90 rounded-2xl p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h4 className="font-bold text-gray-900">{recommendedCard.name}</h4>
                 <p className="text-sm text-gray-600">{recommendedCard.bank}</p>
               </div>
-              <Badge className="bg-blue-100 text-blue-800">Recommended</Badge>
+              <Badge className="bg-blue-100 text-blue-800 rounded-xl">Recommended</Badge>
             </div>
 
             <div className="space-y-3">
@@ -286,7 +287,7 @@ export const CardDropdown = ({ onAddCard, userCards }: { onAddCard: (card: any) 
                 </div>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-3">
+              <div className="bg-blue-50 rounded-2xl p-3">
                 <div className="flex items-center">
                   <TrendingUp className="w-4 h-4 text-blue-600 mr-2" />
                   <span className="text-sm font-medium text-blue-900">Key Benefit</span>
@@ -296,7 +297,7 @@ export const CardDropdown = ({ onAddCard, userCards }: { onAddCard: (card: any) 
             </div>
           </div>
 
-          <div className="bg-gray-100 rounded-lg p-3">
+          <div className="bg-slate-100 rounded-2xl p-3">
             <p className="text-xs text-gray-600 text-center">
               💡 This recommendation is based on your current card portfolio and spending patterns
             </p>

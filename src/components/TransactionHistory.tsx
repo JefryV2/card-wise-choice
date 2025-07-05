@@ -92,7 +92,7 @@ export const TransactionHistory = ({ uploadedTransactions = [], onNavigateToUplo
       )}
 
       {transactions.length === 0 ? (
-        <Card className="ios-card border border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
+        <Card className="ios-card border-2 border-dashed border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-3xl">
           <CardContent className="p-8 text-center">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <Receipt className="w-8 h-8 text-white" />
@@ -102,14 +102,14 @@ export const TransactionHistory = ({ uploadedTransactions = [], onNavigateToUplo
             <div className="flex flex-col gap-3 justify-center">
               <Button 
                 onClick={onNavigateToUpload}
-                className="ios-button-primary w-full"
+                className="h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-2xl font-medium shadow-lg transition-all duration-300 transform active:scale-95"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Upload Bank Records
               </Button>
               <Button 
                 variant="outline" 
-                className="ios-button-secondary w-full"
+                className="h-12 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-2xl font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300"
                 onClick={() => window.open('https://docs.lovable.dev', '_blank')}
               >
                 Learn More
@@ -130,7 +130,7 @@ export const TransactionHistory = ({ uploadedTransactions = [], onNavigateToUplo
       )}
 
       {transactions.length > 0 && filteredTransactions.length === 0 && (
-        <Card className="ios-card">
+        <Card className="ios-card rounded-3xl">
           <CardContent className="p-8 text-center">
             <div className="text-slate-400 mb-4">
               <Receipt className="w-12 h-12 mx-auto" />
