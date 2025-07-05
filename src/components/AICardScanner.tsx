@@ -63,10 +63,13 @@ export const AICardScanner: React.FC<AICardScannerProps> = ({ onCardScanned }) =
     try {
       console.log('Starting AI scan for card:', cardName);
       
+      // Enhanced request with better headers for Android compatibility
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': 'CardWise/1.0',
         },
         body: JSON.stringify({
           contents: [{
@@ -102,6 +105,18 @@ Requirements:
             {
               category: "HARM_CATEGORY_HARASSMENT",
               threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_HATE_SPEECH",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
             }
           ]
         })
@@ -110,11 +125,27 @@ Requirements:
       console.log('API Response status:', response.status);
       
       if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        
+        if (response.status === 400) {
+          throw new Error(`API Error 400: Invalid request. Please check your API key and try again.`);
+        } else if (response.status === 403) {
+          throw new Error(`API Error 403: Access denied. Please verify your API key has the necessary permissions.`);
+        } else if (response.status === 429) {
+          throw new Error(`API Error 429: Rate limit exceeded. Please wait a moment and try again.`);
+        } else {
+          throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+        }
       }
 
       const data = await response.json();
       console.log('API Response data:', data);
+      
+      if (data.error) {
+        console.error('API returned error:', data.error);
+        throw new Error(`API Error: ${data.error.message || 'Unknown error occurred'}`);
+      }
       
       if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
         const jsonText = data.candidates[0].content.parts[0].text.trim();
@@ -147,9 +178,22 @@ Requirements:
       }
     } catch (error) {
       console.error('Card scanning error:', error);
+      
+      let errorMessage = "Could not retrieve card information. Please try again.";
+      
+      if (error.message.includes('400')) {
+        errorMessage = "Invalid request format. Please check your API key and try again.";
+      } else if (error.message.includes('403')) {
+        errorMessage = "Access denied. Please verify your API key permissions.";
+      } else if (error.message.includes('429')) {
+        errorMessage = "Too many requests. Please wait a moment and try again.";
+      } else if (error.message.includes('network') || error.message.includes('fetch')) {
+        errorMessage = "Network error. Please check your connection and try again.";
+      }
+      
       toast({
         title: "Scan Failed",
-        description: error.message || "Could not retrieve card information. Please check your API key and try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
