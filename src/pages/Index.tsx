@@ -39,13 +39,32 @@ const Index = () => {
   const [user, setUser] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  // Load data from localStorage on mount
   useEffect(() => {
-    // Check if user is logged in
     const savedUser = localStorage.getItem('cardwise_user');
+    const savedCards = localStorage.getItem('cardwise_cards');
+    const savedTransactions = localStorage.getItem('cardwise_transactions');
+    
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
+    if (savedCards) {
+      setUserCards(JSON.parse(savedCards));
+    }
+    if (savedTransactions) {
+      setUploadedTransactions(JSON.parse(savedTransactions));
+    }
   }, []);
+
+  // Save cards to localStorage whenever userCards changes
+  useEffect(() => {
+    localStorage.setItem('cardwise_cards', JSON.stringify(userCards));
+  }, [userCards]);
+
+  // Save transactions to localStorage whenever uploadedTransactions changes
+  useEffect(() => {
+    localStorage.setItem('cardwise_transactions', JSON.stringify(uploadedTransactions));
+  }, [uploadedTransactions]);
 
   const handleTabChange = (newTab: string) => {
     if (newTab === activeTab) return;
@@ -54,7 +73,7 @@ const Index = () => {
     setTimeout(() => {
       setActiveTab(newTab);
       setIsAnimating(false);
-    }, 150);
+    }, 200);
   };
 
   const addCard = (card: any) => {
@@ -83,17 +102,21 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col ios-safe-area">
-      {/* iPhone-optimized Header */}
-      <header className="ios-header sticky top-0 z-50 px-4 py-3 transition-all duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col ios-safe-area">
+      {/* Full-screen mobile header */}
+      <header className="bg-white/90 backdrop-blur-xl sticky top-0 z-50 px-6 py-4 border-b border-slate-200/50 shadow-sm">
         <div className="flex items-center justify-between max-w-sm mx-auto">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-200 active:scale-95">
-              <IoWalletOutline className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-800 rounded-3xl flex items-center justify-center shadow-lg">
+              <img 
+                src="/lovable-uploads/080528f8-06b5-47d5-9110-a3a1093875ca.png" 
+                alt="CardWise" 
+                className="w-8 h-8 object-contain"
+              />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">CardWise</h1>
-              <div className="text-xs text-slate-600 dark:text-slate-400 flex items-center">
+              <h1 className="text-xl font-bold text-slate-800">CardWise</h1>
+              <div className="text-xs text-slate-600 flex items-center">
                 <IoTrendingUpOutline className="w-3 h-3 mr-1" />
                 Hello, {user.name.split(' ')[0]}
               </div>
@@ -103,310 +126,216 @@ const Index = () => {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="w-11 h-11 p-0 rounded-full ios-button transition-all duration-200"
+            className="w-12 h-12 p-0 rounded-2xl hover:bg-slate-100 transition-all duration-200"
             onClick={() => handleTabChange('settings')}
           >
-            <IoSettingsOutline className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+            <IoSettingsOutline className="w-6 h-6 text-slate-600" />
           </Button>
         </div>
       </header>
 
-      {/* iPhone-optimized Main Content */}
-      <main className="flex-1 overflow-y-auto scroll-container pb-24">
-        <div className={`max-w-sm mx-auto transition-all duration-300 ${isAnimating ? 'opacity-50 transform translate-y-2' : 'opacity-100 transform translate-y-0'}`}>
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto pb-28">
+        <div className={`max-w-sm mx-auto transition-all duration-300 ease-out ${isAnimating ? 'opacity-50 transform translate-y-1' : 'opacity-100 transform translate-y-0'}`}>
           {activeTab === 'home' && (
-            <div className="ios-section">
+            <div className="p-6 space-y-8">
               {/* Welcome Section */}
-              <div className="text-center py-8 px-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-slate-700 to-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <div className="text-center py-6">
+                <div className="w-20 h-20 bg-gradient-to-br from-slate-700 to-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl">
                   <IoStatsChartOutline className="w-10 h-10 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">Welcome Back! 👋</h2>
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Smart spending companion for maximizing rewards</p>
+                <h2 className="text-2xl font-bold text-slate-800 mb-2">Welcome Back! 👋</h2>
+                <p className="text-slate-600 text-sm leading-relaxed">Smart spending companion for maximizing rewards</p>
               </div>
 
               {/* Quick Stats */}
-              <div className="ios-grid-3 mb-6">
-                <Card className="ios-card hover:shadow-md transition-all duration-300 active:scale-95">
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                <Card className="bg-white/70 backdrop-blur-sm border-slate-200/50 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
                   <CardContent className="p-4 text-center">
-                    <div className="text-xl font-bold text-slate-800 dark:text-slate-100">{userCards.length}</div>
-                    <div className="text-xs text-slate-600 dark:text-slate-400">Cards</div>
-                    {userCards.length > 0 && <div className="w-2 h-2 bg-slate-600 rounded-full mx-auto mt-1"></div>}
+                    <div className="text-2xl font-bold text-slate-800">{userCards.length}</div>
+                    <div className="text-xs text-slate-600 mt-1">Cards</div>
+                    {userCards.length > 0 && <div className="w-2 h-2 bg-green-500 rounded-full mx-auto mt-2"></div>}
                   </CardContent>
                 </Card>
                 
-                <Card className="ios-card hover:shadow-md transition-all duration-300 active:scale-95">
+                <Card className="bg-white/70 backdrop-blur-sm border-slate-200/50 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
                   <CardContent className="p-4 text-center">
-                    <div className="text-xl font-bold text-slate-700">$0</div>
-                    <div className="text-xs text-slate-600 dark:text-slate-400">Rewards</div>
-                    <div className="text-xs text-slate-500">Get started</div>
+                    <div className="text-2xl font-bold text-slate-700">$0</div>
+                    <div className="text-xs text-slate-600 mt-1">Rewards</div>
+                    <div className="text-xs text-slate-500 mt-1">Get started</div>
                   </CardContent>
                 </Card>
                 
-                <Card className="ios-card hover:shadow-md transition-all duration-300 active:scale-95">
+                <Card className="bg-white/70 backdrop-blur-sm border-slate-200/50 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
                   <CardContent className="p-4 text-center">
-                    <div className="text-xl font-bold text-slate-700">{uploadedTransactions.length}</div>
-                    <div className="text-xs text-slate-600 dark:text-slate-400">History</div>
-                    <div className="text-xs text-slate-500">{uploadedTransactions.length > 0 ? 'Ready' : 'Upload'}</div>
+                    <div className="text-2xl font-bold text-slate-700">{uploadedTransactions.length}</div>
+                    <div className="text-xs text-slate-600 mt-1">History</div>
+                    <div className="text-xs text-slate-500 mt-1">{uploadedTransactions.length > 0 ? 'Ready' : 'Upload'}</div>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Primary Actions */}
-              <div className="space-y-4">
+              <div className="space-y-6">
+                {/* AI Scanner - Always visible */}
+                <Card className="bg-gradient-to-r from-slate-700 to-slate-800 text-white border-0 rounded-3xl shadow-xl">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold mb-1">✨ AI Card Scanner</h3>
+                        <p className="text-slate-200 text-sm">Quick setup using camera</p>
+                      </div>
+                      <Button 
+                        onClick={() => handleTabChange('scan')}
+                        className="bg-white/20 text-white hover:bg-white/30 rounded-2xl min-w-12 min-h-12 transition-all duration-200"
+                      >
+                        <IoScanOutline className="w-5 h-5" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {userCards.length === 0 ? (
-                  <div className="space-y-3">
-                    <Card className="ios-card-elevated bg-gradient-to-r from-slate-700 to-slate-800 text-white border-0">
-                      <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="text-lg font-bold mb-1">Add Your First Card</h3>
-                            <p className="text-slate-200 text-sm">Start unlocking all features</p>
-                          </div>
+                  <div className="space-y-4">
+                    <Card className="bg-white/70 backdrop-blur-sm border-slate-200/50 rounded-3xl shadow-lg">
+                      <CardContent className="p-6 text-center">
+                        <h3 className="font-bold text-slate-800 mb-2">🚀 Ready to Get Started?</h3>
+                        <p className="text-slate-600 text-sm mb-4 leading-relaxed">Add your credit cards to unlock personalized recommendations</p>
+                        <div className="grid grid-cols-2 gap-3">
                           <Button 
                             onClick={() => handleTabChange('cards')}
-                            className="ios-button bg-white text-slate-700 hover:bg-slate-100 shadow-md min-w-11 min-h-11 transition-all duration-200"
+                            className="bg-slate-700 hover:bg-slate-800 text-white rounded-2xl h-12 font-medium transition-all duration-200"
                           >
-                            <IoAddOutline className="w-5 h-5" />
+                            📝 Manual Add
+                          </Button>
+                          <Button 
+                            onClick={() => handleTabChange('upload')}
+                            variant="outline"
+                            className="border-slate-300 text-slate-700 rounded-2xl h-12 font-medium transition-all duration-200"
+                          >
+                            📤 Upload
                           </Button>
                         </div>
                       </CardContent>
                     </Card>
-
-                    <div className="space-y-3">
-                      <Button
-                        variant="outline"
-                        className="ios-list-item w-full justify-between"
-                        onClick={() => handleTabChange('scan')}
-                      >
-                        <div className="flex items-center">
-                          <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-500 rounded-xl flex items-center justify-center mr-4">
-                            <IoScanOutline className="w-6 h-6 text-white" />
-                          </div>
-                          <div className="text-left">
-                            <div className="font-medium text-slate-800 dark:text-slate-100">✨ AI Card Scanner</div>
-                            <div className="text-xs text-slate-600 dark:text-slate-400">Quick setup using camera</div>
-                          </div>
-                        </div>
-                        <ArrowRight className="w-5 h-5 text-slate-400" />
-                      </Button>
-
-                      <Button
-                        variant="outline"
-                        className="ios-list-item w-full justify-between"
-                        onClick={() => handleTabChange('upload')}
-                      >
-                        <div className="flex items-center">
-                          <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
-                            <IoCloudUploadOutline className="w-6 h-6 text-white" />
-                          </div>
-                          <div className="text-left">
-                            <div className="font-medium text-slate-800 dark:text-slate-100">📤 Upload Records</div>
-                            <div className="text-xs text-slate-600 dark:text-slate-400">Import transaction history</div>
-                          </div>
-                        </div>
-                        <ArrowRight className="w-5 h-5 text-slate-400" />
-                      </Button>
-                    </div>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    <Card className="ios-card-elevated bg-gradient-to-r from-slate-700 to-slate-800 text-white border-0">
+                  <div className="space-y-4">
+                    {/* Get Recommendation */}
+                    <Card className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 rounded-3xl shadow-xl">
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="text-lg font-bold mb-1">Get Recommendation</h3>
-                            <p className="text-slate-200 text-sm">Find perfect card for purchase</p>
+                            <p className="text-emerald-50 text-sm">Find perfect card for purchase</p>
                           </div>
                           <Button 
                             onClick={() => handleTabChange('recommend')}
-                            className="ios-button bg-white text-slate-700 hover:bg-slate-100 shadow-md min-w-11 min-h-11 transition-all duration-200"
+                            className="bg-white/20 text-white hover:bg-white/30 rounded-2xl min-w-12 min-h-12 transition-all duration-200"
                           >
                             <ArrowRight className="w-5 h-5" />
                           </Button>
                         </div>
                       </CardContent>
                     </Card>
-
-                    <div className="space-y-2">
-                      <Button
-                        variant="outline"
-                        className="ios-list-item w-full justify-between"
-                        onClick={() => handleTabChange('transactions')}
-                      >
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center mr-3">
-                            <IoDocumentTextOutline className="w-5 h-5 text-white" />
-                          </div>
-                          <div className="text-left">
-                            <div className="font-medium text-slate-800 dark:text-slate-100 text-sm">Transaction History</div>
-                            <div className="text-xs text-slate-600 dark:text-slate-400">View spending activity</div>
-                          </div>
-                        </div>
-                        <ArrowRight className="w-4 h-4 text-slate-400" />
-                      </Button>
-
-                      <Button
-                        variant="outline"
-                        className="ios-list-item w-full justify-between"
-                        onClick={() => handleTabChange('rewards')}
-                      >
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-500 rounded-xl flex items-center justify-center mr-3">
-                            <IoGiftOutline className="w-5 h-5 text-white" />
-                          </div>
-                          <div className="text-left">
-                            <div className="font-medium text-slate-800 dark:text-slate-100 text-sm">View Rewards</div>
-                            <div className="text-xs text-slate-600 dark:text-slate-400">Track your earnings</div>
-                          </div>
-                        </div>
-                        <ArrowRight className="w-4 h-4 text-slate-400" />
-                      </Button>
-                    </div>
                   </div>
                 )}
 
-                <div className="space-y-2 mt-6">
-                  <div className="ios-section-header">Tools</div>
-                  <Button
-                    variant="outline"
-                    className="ios-list-item w-full justify-between"
-                    onClick={() => handleTabChange('analytics')}
-                  >
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mr-3">
-                        <IoPieChartOutline className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="text-left">
-                        <div className="font-medium text-slate-800 dark:text-slate-100 text-sm">Spending Analytics</div>
-                        <div className="text-xs text-slate-600 dark:text-slate-400">Analyze patterns</div>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-slate-400" />
-                  </Button>
+                {/* Quick Access Tools */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wider px-2">Quick Access</h3>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      variant="outline"
+                      className="bg-white/70 backdrop-blur-sm border-slate-200/50 rounded-2xl h-16 flex-col space-y-1 transition-all duration-200 hover:shadow-lg"
+                      onClick={() => handleTabChange('transactions')}
+                    >
+                      <IoDocumentTextOutline className="w-5 h-5 text-slate-600" />
+                      <span className="text-xs font-medium text-slate-700">History</span>
+                    </Button>
 
-                  <Button
-                    variant="outline"
-                    className="ios-list-item w-full justify-between"
-                    onClick={() => handleTabChange('budget')}
-                  >
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-yellow-500 rounded-xl flex items-center justify-center mr-3">
-                        <IoFlagOutline className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="text-left">
-                        <div className="font-medium text-slate-800 dark:text-slate-100 text-sm">Budget Tracking</div>
-                        <div className="text-xs text-slate-600 dark:text-slate-400">Monitor spending goals</div>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-slate-400" />
-                  </Button>
+                    <Button
+                      variant="outline"
+                      className="bg-white/70 backdrop-blur-sm border-slate-200/50 rounded-2xl h-16 flex-col space-y-1 transition-all duration-200 hover:shadow-lg"
+                      onClick={() => handleTabChange('cards')}
+                    >
+                      <IoCardOutline className="w-5 h-5 text-slate-600" />
+                      <span className="text-xs font-medium text-slate-700">Cards</span>
+                    </Button>
 
-                  <Button
-                    variant="outline"
-                    className="ios-list-item w-full justify-between"
-                    onClick={() => handleTabChange('export')}
-                  >
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center mr-3">
-                        <IoDownloadOutline className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="text-left">
-                        <div className="font-medium text-slate-800 dark:text-slate-100 text-sm">Export Data</div>
-                        <div className="text-xs text-slate-600 dark:text-slate-400">Download reports</div>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-slate-400" />
-                  </Button>
+                    <Button
+                      variant="outline"
+                      className="bg-white/70 backdrop-blur-sm border-slate-200/50 rounded-2xl h-16 flex-col space-y-1 transition-all duration-200 hover:shadow-lg"
+                      onClick={() => handleTabChange('rewards')}
+                    >
+                      <IoGiftOutline className="w-5 h-5 text-slate-600" />
+                      <span className="text-xs font-medium text-slate-700">Rewards</span>
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="bg-white/70 backdrop-blur-sm border-slate-200/50 rounded-2xl h-16 flex-col space-y-1 transition-all duration-200 hover:shadow-lg"
+                      onClick={() => handleTabChange('analytics')}
+                    >
+                      <IoPieChartOutline className="w-5 h-5 text-slate-600" />
+                      <span className="text-xs font-medium text-slate-700">Analytics</span>
+                    </Button>
+                  </div>
                 </div>
-
-                {userCards.length === 0 && (
-                  <Card className="ios-card border border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 mt-6">
-                    <CardContent className="p-6 text-center">
-                      <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <IoWalletOutline className="w-8 h-8 text-white" />
-                      </div>
-                      <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-2">🚀 Ready to Get Started?</h3>
-                      <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">Add your credit cards to unlock personalized recommendations</p>
-                      <div className="ios-grid-2 gap-3">
-                        <Button 
-                          onClick={() => handleTabChange('scan')}
-                          className="ios-button-primary text-sm"
-                        >
-                          ✨ AI Scan
-                        </Button>
-                        <Button 
-                          onClick={() => handleTabChange('cards')}
-                          variant="outline"
-                          className="ios-button-secondary text-sm"
-                        >
-                          📝 Manual Add
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
               </div>
             </div>
           )}
 
-          {/* Other tab content */}
+          {/* Other tab content remains the same but with updated back buttons */}
           {activeTab === 'recommend' && (
-            <div className="ios-section">
-              <div className="mb-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleTabChange('home')}
-                  className="ios-button mb-2 transition-all duration-200"
-                >
-                  ← Back to Home
-                </Button>
-              </div>
+            <div className="p-6 space-y-6">
+              <Button
+                variant="ghost"
+                onClick={() => handleTabChange('home')}
+                className="flex items-center text-slate-600 hover:text-slate-800 transition-colors duration-200 rounded-2xl"
+              >
+                ← Back to Home
+              </Button>
               <ManualRecommendation userCards={userCards} onPurchaseConfirmed={handlePurchaseConfirmed} />
             </div>
           )}
 
           {activeTab === 'upload' && (
-            <div className="ios-section">
-              <div className="mb-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleTabChange('home')}
-                  className="ios-button mb-2 transition-all duration-200"
-                >
-                  ← Back to Home
-                </Button>
-              </div>
+            <div className="p-6 space-y-6">
+              <Button
+                variant="ghost"
+                onClick={() => handleTabChange('home')}
+                className="flex items-center text-slate-600 hover:text-slate-800 transition-colors duration-200 rounded-2xl"
+              >
+                ← Back to Home
+              </Button>
               <BankRecordUpload onTransactionsImported={handleTransactionsImported} />
             </div>
           )}
 
           {activeTab === 'export' && (
-            <div className="ios-section">
-              <div className="mb-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleTabChange('home')}
-                  className="ios-button mb-2 transition-all duration-200"
-                >
-                  ← Back to Home
-                </Button>
-              </div>
+            <div className="p-6 space-y-6">
+              <Button
+                variant="ghost"
+                onClick={() => handleTabChange('home')}
+                className="flex items-center text-slate-600 hover:text-slate-800 transition-colors duration-200 rounded-2xl"
+              >
+                ← Back to Home
+              </Button>
               <DataExport />
             </div>
           )}
 
           {activeTab === 'transactions' && (
-            <div className="ios-section">
-              <div className="mb-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleTabChange('home')}
-                  className="ios-button mb-2 transition-all duration-200"
-                >
-                  ← Back to Home
-                </Button>
-              </div>
+            <div className="p-6 space-y-6">
+              <Button
+                variant="ghost"
+                onClick={() => handleTabChange('home')}
+                className="flex items-center text-slate-600 hover:text-slate-800 transition-colors duration-200 rounded-2xl"
+              >
+                ← Back to Home
+              </Button>
               <TransactionHistory 
                 uploadedTransactions={uploadedTransactions} 
                 onNavigateToUpload={() => handleTabChange('upload')} 
@@ -415,46 +344,40 @@ const Index = () => {
           )}
 
           {activeTab === 'analytics' && (
-            <div className="ios-section">
-              <div className="mb-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleTabChange('home')}
-                  className="ios-button mb-2 transition-all duration-200"
-                >
-                  ← Back to Home
-                </Button>
-              </div>
+            <div className="p-6 space-y-6">
+              <Button
+                variant="ghost"
+                onClick={() => handleTabChange('home')}
+                className="flex items-center text-slate-600 hover:text-slate-800 transition-colors duration-200 rounded-2xl"
+              >
+                ← Back to Home
+              </Button>
               <SpendingAnalytics />
             </div>
           )}
 
           {activeTab === 'budget' && (
-            <div className="ios-section">
-              <div className="mb-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleTabChange('home')}
-                  className="ios-button mb-2 transition-all duration-200"
-                >
-                  ← Back to Home
-                </Button>
-              </div>
+            <div className="p-6 space-y-6">
+              <Button
+                variant="ghost"
+                onClick={() => handleTabChange('home')}
+                className="flex items-center text-slate-600 hover:text-slate-800 transition-colors duration-200 rounded-2xl"
+              >
+                ← Back to Home
+              </Button>
               <BudgetTracking />
             </div>
           )}
 
           {activeTab === 'cards' && (
-            <div className="ios-section">
-              <div className="mb-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleTabChange('home')}
-                  className="ios-button mb-2 transition-all duration-200"
-                >
-                  ← Back to Home
-                </Button>
-              </div>
+            <div className="p-6 space-y-6">
+              <Button
+                variant="ghost"
+                onClick={() => handleTabChange('home')}
+                className="flex items-center text-slate-600 hover:text-slate-800 transition-colors duration-200 rounded-2xl"
+              >
+                ← Back to Home
+              </Button>
               <CardDropdown onAddCard={addCard} userCards={userCards} />
               <div className="mt-6">
                 <CreditCardManager 
@@ -467,57 +390,53 @@ const Index = () => {
           )}
 
           {activeTab === 'scan' && (
-            <div className="ios-section">
-              <div className="mb-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleTabChange('home')}
-                  className="ios-button mb-2 transition-all duration-200"
-                >
-                  ← Back to Home
-                </Button>
-              </div>
+            <div className="p-6 space-y-6">
+              <Button
+                variant="ghost"
+                onClick={() => handleTabChange('home')}
+                className="flex items-center text-slate-600 hover:text-slate-800 transition-colors duration-200 rounded-2xl"
+              >
+                ← Back to Home
+              </Button>
               <AICardScanner onCardScanned={addCard} />
             </div>
           )}
 
           {activeTab === 'rewards' && (
-            <div className="ios-section">
-              <div className="mb-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleTabChange('home')}
-                  className="ios-button mb-2 transition-all duration-200"
-                >
-                  ← Back to Home
-                </Button>
-              </div>
+            <div className="p-6 space-y-6">
+              <Button
+                variant="ghost"
+                onClick={() => handleTabChange('home')}
+                className="flex items-center text-slate-600 hover:text-slate-800 transition-colors duration-200 rounded-2xl"
+              >
+                ← Back to Home
+              </Button>
               <RewardsDashboard userCards={userCards} />
             </div>
           )}
 
           {activeTab === 'settings' && (
-            <div className="ios-section">
-              <div className="mb-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleTabChange('home')}
-                  className="ios-button mb-2 transition-all duration-200"
-                >
-                  ← Back to Home
-                </Button>
-              </div>
+            <div className="p-6 space-y-6">
+              <Button
+                variant="ghost"
+                onClick={() => handleTabChange('home')}
+                className="flex items-center text-slate-600 hover:text-slate-800 transition-colors duration-200 rounded-2xl"
+              >
+                ← Back to Home
+              </Button>
               <SettingsComponent />
               
-              <Card className="ios-card mt-6 border border-red-200">
-                <CardContent className="p-4 text-center">
+              <Card className="bg-white/70 backdrop-blur-sm border-red-200/50 rounded-3xl mt-6">
+                <CardContent className="p-6 text-center">
                   <Button
                     variant="outline"
                     onClick={() => {
                       localStorage.removeItem('cardwise_user');
+                      localStorage.removeItem('cardwise_cards');
+                      localStorage.removeItem('cardwise_transactions');
                       setUser(null);
                     }}
-                    className="text-red-600 border-red-200 hover:bg-red-50"
+                    className="text-red-600 border-red-200 hover:bg-red-50 rounded-2xl"
                   >
                     <IoPersonOutline className="w-4 h-4 mr-2" />
                     Sign Out
@@ -529,12 +448,16 @@ const Index = () => {
         </div>
       </main>
 
-      {/* iPhone-optimized Bottom Navigation */}
-      <div className="ios-bottom-sheet border-t border-slate-200/50 dark:border-slate-800/50">
-        <div className="flex items-center justify-around py-2 max-w-sm mx-auto">
+      {/* Enhanced Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-200/50 px-4 py-3 shadow-lg">
+        <div className="flex items-center justify-around max-w-sm mx-auto">
           <button
             onClick={() => handleTabChange('home')}
-            className={`ios-nav-item transition-all duration-200 ${activeTab === 'home' ? 'active' : ''}`}
+            className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-200 ${
+              activeTab === 'home' 
+                ? 'bg-slate-100 text-slate-800 transform scale-105' 
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+            }`}
           >
             <IoHomeOutline className="w-6 h-6 mb-1" />
             <span className="text-xs font-medium">Home</span>
@@ -542,31 +465,35 @@ const Index = () => {
 
           <button
             onClick={() => handleTabChange('transactions')}
-            className={`ios-nav-item transition-all duration-200 ${activeTab === 'transactions' ? 'active' : ''}`}
+            className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-200 ${
+              activeTab === 'transactions' 
+                ? 'bg-slate-100 text-slate-800 transform scale-105' 
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+            }`}
           >
             <IoDocumentTextOutline className="w-6 h-6 mb-1" />
             <span className="text-xs font-medium">History</span>
           </button>
 
           <button
-            onClick={() => handleTabChange('upload')}
-            className={`ios-nav-item transition-all duration-200 ${activeTab === 'upload' ? 'active' : ''}`}
+            onClick={() => handleTabChange('scan')}
+            className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-200 ${
+              activeTab === 'scan' 
+                ? 'bg-slate-100 text-slate-800 transform scale-105' 
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+            }`}
           >
-            <IoCloudUploadOutline className="w-6 h-6 mb-1" />
-            <span className="text-xs font-medium">Upload</span>
-          </button>
-
-          <button
-            onClick={() => handleTabChange('export')}
-            className={`ios-nav-item transition-all duration-200 ${activeTab === 'export' ? 'active' : ''}`}
-          >
-            <IoDownloadOutline className="w-6 h-6 mb-1" />
-            <span className="text-xs font-medium">Export</span>
+            <IoScanOutline className="w-6 h-6 mb-1" />
+            <span className="text-xs font-medium">Scan</span>
           </button>
 
           <button
             onClick={() => handleTabChange('cards')}
-            className={`ios-nav-item transition-all duration-200 ${activeTab === 'cards' ? 'active' : ''}`}
+            className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-200 ${
+              activeTab === 'cards' 
+                ? 'bg-slate-100 text-slate-800 transform scale-105' 
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+            }`}
           >
             <IoCardOutline className="w-6 h-6 mb-1" />
             <span className="text-xs font-medium">Cards</span>

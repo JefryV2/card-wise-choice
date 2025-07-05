@@ -63,18 +63,11 @@ export const AICardScanner: React.FC<AICardScannerProps> = ({ onCardScanned }) =
     try {
       console.log('Starting AI scan for card:', cardName);
       
-      // Enhanced request with better headers for Android compatibility
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': 'CardWise/1.0',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Provide detailed information about the credit card "${cardName}". Return ONLY a valid JSON object with this exact structure:
+      // Fixed API request format for better Android compatibility
+      const requestBody = {
+        contents: [{
+          parts: [{
+            text: `Provide detailed information about the credit card "${cardName}". Return ONLY a valid JSON object with this exact structure:
 
 {
   "name": "exact card name",
@@ -93,33 +86,43 @@ Requirements:
 - rewardRate must be a string representing the base rate percentage
 - bonusCategory must be one of: dining, gas, groceries, travel, online, streaming, general
 - Return ONLY the JSON object, no other text or formatting`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.1,
-            topK: 1,
-            topP: 1,
-            maxOutputTokens: 1024,
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.1,
+          topK: 1,
+          topP: 1,
+          maxOutputTokens: 1024,
+        },
+        safetySettings: [
+          {
+            category: "HARM_CATEGORY_HARASSMENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
           },
-          safetySettings: [
-            {
-              category: "HARM_CATEGORY_HARASSMENT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_HATE_SPEECH",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            }
-          ]
-        })
+          {
+            category: "HARM_CATEGORY_HATE_SPEECH",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          }
+        ]
+      };
+
+      console.log('Request body:', JSON.stringify(requestBody));
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
       });
 
       console.log('API Response status:', response.status);
@@ -128,15 +131,17 @@ Requirements:
         const errorText = await response.text();
         console.error('API Error Response:', errorText);
         
+        let errorMessage = `API request failed (${response.status})`;
+        
         if (response.status === 400) {
-          throw new Error(`API Error 400: Invalid request. Please check your API key and try again.`);
+          errorMessage = "Invalid request format. Please check your API key and try again.";
         } else if (response.status === 403) {
-          throw new Error(`API Error 403: Access denied. Please verify your API key has the necessary permissions.`);
+          errorMessage = "Access denied. Please verify your API key permissions.";
         } else if (response.status === 429) {
-          throw new Error(`API Error 429: Rate limit exceeded. Please wait a moment and try again.`);
-        } else {
-          throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+          errorMessage = "Rate limit exceeded. Please wait a moment and try again.";
         }
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -165,8 +170,8 @@ Requirements:
           
           setScannedData(cardData);
           toast({
-            title: "Card Scanned Successfully!",
-            description: `Found details for ${cardData.name}`,
+            title: "Card Found!",
+            description: `Successfully scanned ${cardData.name}`,
           });
         } catch (parseError) {
           console.error('JSON parsing error:', parseError);
@@ -179,21 +184,9 @@ Requirements:
     } catch (error) {
       console.error('Card scanning error:', error);
       
-      let errorMessage = "Could not retrieve card information. Please try again.";
-      
-      if (error.message.includes('400')) {
-        errorMessage = "Invalid request format. Please check your API key and try again.";
-      } else if (error.message.includes('403')) {
-        errorMessage = "Access denied. Please verify your API key permissions.";
-      } else if (error.message.includes('429')) {
-        errorMessage = "Too many requests. Please wait a moment and try again.";
-      } else if (error.message.includes('network') || error.message.includes('fetch')) {
-        errorMessage = "Network error. Please check your connection and try again.";
-      }
-      
       toast({
         title: "Scan Failed",
-        description: errorMessage,
+        description: error.message || "Could not retrieve card information. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -207,17 +200,17 @@ Requirements:
       setScannedData(null);
       setCardName('');
       toast({
-        title: "Card Added Successfully!",
-        description: "The AI-scanned card has been added to your portfolio.",
+        title: "Card Added!",
+        description: "The AI-scanned card has been added to your collection.",
       });
     }
   };
 
   if (showApiKeyInput) {
     return (
-      <Card className="border border-gray-200">
+      <Card className="bg-white/70 backdrop-blur-sm border-slate-200/50 rounded-3xl shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center text-gray-900">
+          <CardTitle className="flex items-center text-slate-800">
             <AlertCircle className="h-5 w-5 mr-2 text-amber-500" />
             Gemini API Key Required
           </CardTitle>
@@ -227,7 +220,7 @@ Requirements:
               href="https://aistudio.google.com/app/apikey" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-blue-600 underline"
+              className="text-slate-700 font-semibold underline"
             >
               Google AI Studio
             </a>
@@ -235,24 +228,27 @@ Requirements:
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="apiKey">Gemini API Key</Label>
+            <Label htmlFor="apiKey" className="text-slate-700 font-medium">Gemini API Key</Label>
             <Input
               id="apiKey"
               type="password"
               placeholder="Enter your Gemini API key"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              className="mt-1"
+              className="mt-2 h-12 rounded-2xl border-slate-200 bg-slate-50/50 focus:bg-white transition-colors"
             />
           </div>
           <div className="flex space-x-3">
-            <Button onClick={handleApiKeySave} className="flex-1 bg-gray-900 hover:bg-gray-700">
+            <Button 
+              onClick={handleApiKeySave} 
+              className="flex-1 bg-slate-700 hover:bg-slate-800 rounded-2xl h-12 font-medium transition-all duration-200"
+            >
               Save & Continue
             </Button>
             <Button 
               variant="outline" 
               onClick={() => setShowApiKeyInput(false)}
-              className="flex-1"
+              className="flex-1 border-slate-300 rounded-2xl h-12 font-medium transition-all duration-200"
             >
               Cancel
             </Button>
@@ -263,10 +259,10 @@ Requirements:
   }
 
   return (
-    <div className="space-y-4">
-      <Card className="border border-gray-200">
+    <div className="space-y-6">
+      <Card className="bg-white/70 backdrop-blur-sm border-slate-200/50 rounded-3xl shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center text-gray-900">
+          <CardTitle className="flex items-center text-slate-800">
             <Sparkles className="h-5 w-5 mr-2" />
             AI Card Scanner
           </CardTitle>
@@ -276,20 +272,20 @@ Requirements:
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="cardName">Credit Card Name</Label>
+            <Label htmlFor="cardName" className="text-slate-700 font-medium">Credit Card Name</Label>
             <Input
               id="cardName"
               value={cardName}
               onChange={(e) => setCardName(e.target.value)}
               placeholder="e.g., Chase Sapphire Preferred"
-              className="mt-1"
+              className="mt-2 h-12 rounded-2xl border-slate-200 bg-slate-50/50 focus:bg-white transition-colors"
             />
           </div>
           
           <Button 
             onClick={scanCard}
             disabled={isScanning || !cardName.trim()}
-            className="w-full bg-gray-900 hover:bg-gray-700"
+            className="w-full bg-slate-700 hover:bg-slate-800 rounded-2xl h-12 font-medium transition-all duration-200"
           >
             {isScanning ? (
               <>
@@ -308,7 +304,7 @@ Requirements:
             variant="ghost"
             size="sm"
             onClick={() => setShowApiKeyInput(true)}
-            className="w-full text-gray-600"
+            className="w-full text-slate-600 rounded-2xl"
           >
             Change API Key
           </Button>
@@ -316,7 +312,7 @@ Requirements:
       </Card>
 
       {scannedData && (
-        <Card className="border border-green-200 bg-green-50">
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200/50 rounded-3xl shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center text-green-800">
               <CheckCircle className="h-5 w-5 mr-2" />
@@ -324,42 +320,42 @@ Requirements:
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="bg-white rounded-lg p-4">
+            <div className="bg-white/80 rounded-2xl p-4">
               <div className="space-y-3">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">{scannedData.name}</h3>
-                  <p className="text-gray-600">{scannedData.bank}</p>
+                  <h3 className="text-lg font-bold text-slate-800">{scannedData.name}</h3>
+                  <p className="text-slate-600">{scannedData.bank}</p>
                 </div>
                 
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">{scannedData.type}</Badge>
+                  <Badge variant="secondary" className="rounded-xl">{scannedData.type}</Badge>
                   {scannedData.bonusCategory && (
-                    <Badge variant="outline">{scannedData.bonusCategory}</Badge>
+                    <Badge variant="outline" className="rounded-xl">{scannedData.bonusCategory}</Badge>
                   )}
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-600">Base Rate:</span>
+                    <span className="text-slate-600">Base Rate:</span>
                     <p className="font-medium">{scannedData.rewardRate}%</p>
                   </div>
                   <div>
-                    <span className="text-gray-600">Annual Fee:</span>
+                    <span className="text-slate-600">Annual Fee:</span>
                     <p className="font-medium">${scannedData.annualFee}</p>
                   </div>
                 </div>
                 
                 {scannedData.signupBonus && (
                   <div>
-                    <span className="text-gray-600 text-sm">Sign-up Bonus:</span>
-                    <p className="text-sm font-medium text-green-600">{scannedData.signupBonus}</p>
+                    <span className="text-slate-600 text-sm">Sign-up Bonus:</span>
+                    <p className="text-sm font-medium text-green-700">{scannedData.signupBonus}</p>
                   </div>
                 )}
                 
                 {scannedData.notes && (
                   <div>
-                    <span className="text-gray-600 text-sm">Benefits:</span>
-                    <p className="text-sm text-gray-700">{scannedData.notes}</p>
+                    <span className="text-slate-600 text-sm">Benefits:</span>
+                    <p className="text-sm text-slate-700">{scannedData.notes}</p>
                   </div>
                 )}
               </div>
@@ -368,14 +364,14 @@ Requirements:
             <div className="flex space-x-3">
               <Button 
                 onClick={addScannedCard}
-                className="flex-1 bg-green-600 hover:bg-green-700"
+                className="flex-1 bg-green-600 hover:bg-green-700 rounded-2xl h-12 font-medium transition-all duration-200"
               >
                 Add This Card
               </Button>
               <Button 
                 variant="outline" 
                 onClick={() => setScannedData(null)}
-                className="flex-1"
+                className="flex-1 border-slate-300 rounded-2xl h-12 font-medium transition-all duration-200"
               >
                 Scan Again
               </Button>
